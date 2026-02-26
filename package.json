@@ -2,7 +2,17 @@
   "name": "@org/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+"scripts": {
+    "dev:api": "npx nx serve api",
+    "dev:shop": "npx nx serve shop",
+    "dev:all": "concurrently -c \"blue,green,red,gray,magenta\" \"npm:dev-*\"",
+    "lint:all":"npx nx run-many -t lint",
+    "lint:allFix":"npx nx run-many -t lint --fix",
+    "lint:shop":"npx nx lint shop",
+    "lint:api":"npx nx lint api",
+    "lint:shopErrors":"npx nx lint shop --verbose",
+    "lint:shopFix":"npx nx lint shop --fix"
+  },  
   "private": true,
   "dependencies": {
     "express": "^4.21.2",

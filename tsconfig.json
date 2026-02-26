@@ -7,9 +7,6 @@
       "path": "./apps/api"
     },
     {
-      "path": "./apps/shop-e2e"
-    },
-    {
       "path": "./apps/shop"
     },
     {
@@ -29,9 +26,6 @@
     },
     {
       "path": "./libs/shop/shared-ui"
-    },
-    {
-      "path": "./libs/shared/test-utils"
     }
   ]
 }

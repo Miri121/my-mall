@@ -1,12 +1,11 @@
 import express from 'express';
-import { ProductsService } from '@org/api-products';
 import {  } from '@org/models';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3333;
 
 const app = express();
-const productsService = new ProductsService();
+// const productsService = new ProductsService();
 
 // Middleware
 app.use(express.json());
