@@ -241,6 +241,7 @@
   - [ ] email (unique, not null)
   - [ ] password (hashed, not null)
   - [ ] name (not null)
+  - [ ] phone (nullable)
   - [ ] role (enum: customer, vendor, admin)
   - [ ] avatar (nullable)
   - [ ] isActive (boolean, default true)
@@ -251,9 +252,12 @@
 
 - [ ] Create `vendors` table
   - [ ] id (UUID, primary key)
-  - [ ] userId (foreign key to users)
   - [ ] company (not null)
+  - [ ] email (unique, not null)
+  - [ ] password (hashed, not null)
   - [ ] phone (nullable)
+  - [ ] avatar (nullable)
+  - [ ] isActive (boolean, default true)
   - [ ] createdAt (timestamp)
   - [ ] updatedAt (timestamp)
 
@@ -263,6 +267,7 @@
   - [ ] id (UUID, primary key)
   - [ ] name (not null)
   - [ ] slug (unique, not null)
+  - [ ] url (text, not null)
   - [ ] description (text, nullable)
   - [ ] logo (nullable)
   - [ ] coverImage (nullable)
@@ -278,21 +283,15 @@
   - [ ] id (UUID, primary key)
   - [ ] name (not null)
   - [ ] description (text, nullable)
+  - [ ] img (text (url), not null)
   - [ ] price (decimal, not null)
   - [ ] comparePrice (decimal, nullable)
-  - [ ] stock (integer, default 0)
   - [ ] storeId (foreign key to stores)
   - [ ] categoryId (foreign key to categories, nullable)
   - [ ] isActive (boolean, default true)
   - [ ] createdAt (timestamp)
   - [ ] updatedAt (timestamp)
 
-- [ ] Create `product_images` table
-  - [ ] id (UUID, primary key)
-  - [ ] productId (foreign key to products)
-  - [ ] url (not null)
-  - [ ] order (integer, default 0)
-  - [ ] createdAt (timestamp)
 
 #### 7.2.5 Create Category Tables
 
