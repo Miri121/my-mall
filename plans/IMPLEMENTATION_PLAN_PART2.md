@@ -252,11 +252,12 @@
 
 - [ ] Create `vendors` table
   - [ ] id (UUID, primary key)
-  - [ ] company (not null)
+  - [ ] companyName (not null)
   - [ ] email (unique, not null)
   - [ ] password (hashed, not null)
+  - [ ] name (not null)
   - [ ] phone (nullable)
-  - [ ] avatar (nullable)
+  - [ ] role (enum: customer, vendor, admin)
   - [ ] isActive (boolean, default true)
   - [ ] createdAt (timestamp)
   - [ ] updatedAt (timestamp)
