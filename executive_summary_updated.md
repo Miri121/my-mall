@@ -47,6 +47,7 @@ This approach means:
 The Admin app is the control center where administrators:
 
 - **Create, update, or delete vendor and user accounts** (email, name, company, password) or Google OAuth
+  - **Note:** Vendors are a separate entity with their own authentication system, NOT stored in the users table
 - **Create, update, or delete stores** and assign them to vendors
 - View all users, stores, and products on the platform
 - Monitor platform activity and statistics
@@ -103,9 +104,14 @@ Everything lives in one codebase organized into folders:
 
 - **Authentication** - Login, logout, session management, role-based access control
 - **Vendors** - Everything related to managing vendor accounts (CRUD operations)
+  - Fields: id, email, password, name, company, phone, isActive, createdAt, updatedAt
 - **Stores** - Everything related to managing stores (CRUD operations)
+  - Fields: id, name, slug, **url** (REQUIRED - external website URL for iframe), description, logo, coverImage, vendorId, isActive, createdAt, updatedAt
 - **Products** - Everything related to managing products (CRUD operations)
+  - Fields: id, name, description, **images** (JSON array of URLs/paths), price, comparePrice, **stock** (inventory quantity), storeId, categoryId, isActive, createdAt, updatedAt
+  - **Note:** Images are stored in server filesystem or cloud storage (S3/Cloudinary), database only stores the paths as JSON array
 - **Users** - Customer account management (CRUD operations)
+  - Fields: id, email, password, name, phone, role, avatar, isActive, createdAt, updatedAt
 - **Search** - Search functionality with filters
 - **Analytics** - Track views, clicks, popular products
 
@@ -267,11 +273,11 @@ Defines what valid data looks like:
 1. Vendor navigates to "My Account"
 2. Can update password or reset password
 3. Confirmation dialog appears (shadcn/ui Dialog component)
-   4.Submits form, TanStack Query sends request to API
-   5.Server-side verification is done to ensure this is the correct vendor .
-   6.Success toast notification appears (shadcn/ui Toast component)
-4. Vendor receives email with new login credentials
-5. Changes saved to profile
+4. Submits form, TanStack Query sends request to API
+5. Server-side verification is done to ensure this is the correct vendor
+6. Success toast notification appears (shadcn/ui Toast component)
+7. Vendor receives email with new login credentials
+8. Changes saved to profile
 
 ### Vendor Journey: Managing Products
 
@@ -359,7 +365,7 @@ Defines what valid data looks like:
 3. Customer can add to favorites (saved via Zustand to local storage)
 4. Clicks on a store card
 5. TanStack Router preloads store data and navigates
-6. Store page a screen that hosts another website where all the store products will be (external api)
+6. Store page displays an iframe embedding the external website URL (stored in store.url field)
 7. Customer can search globally to find specific products
 8. Applies filters (category, price range) using shadcn/ui Select components
 9. Results update in real-time as customer types
@@ -676,22 +682,24 @@ Defines what valid data looks like:
 
 ### CRUD Permission Matrix
 
-| Operation | Entity          | Admin | Vendor             | Customer  |
-| --------- | --------------- | ----- | ------------------ | --------- |
-| Create    | Vendor          | ✅    | ❌                 | ❌        |
-| Read      | Vendor          | ✅    | ✅ (self only)     | ❌        |
-| Update    | Vendor          | ✅    | ✅ (only password) | ❌        |
-| Delete    | Vendor          | ✅    | ❌                 | ❌        |
-| Create    | Store           | ✅    | ❌                 | ❌        |
-| Update    | Store           | ✅    | ❌                 | ❌        |
-| Delete    | Store           | ✅    | ❌                 | ❌        |
-| Create    | Product         | ✅    | ✅ (own)           | ❌        |
-| Update    | Product         | ✅    | ✅ (own)           | ❌        |
-| Delete    | Product         | ✅    | ✅ (own)           | ❌        |
-| View      | Product         | ✅    | ✅                 | ✅        |
-| Create    | User (Customer) | ✅    | ❌                 | ✅ (self) |
-| Update    | User (Customer) | ✅    | ❌                 | ✅ (self) |
-| Delete    | User (Customer) | ✅    | ❌                 | ✅ (self) |
+| Operation | Entity          | Admin           | Vendor                   | Customer  |
+| --------- | --------------- | --------------- | ------------------------ | --------- |
+| Create    | Vendor          | ✅              | ❌                       | ❌        |
+| Read      | Vendor          | ✅              | ✅ (self only)           | ❌        |
+| Update    | Vendor          | ✅ (all fields) | ✅ (password only, self) | ❌        |
+| Delete    | Vendor          | ✅              | ❌                       | ❌        |
+| Create    | Store           | ✅              | ❌                       | ❌        |
+| Update    | Store           | ✅              | ❌                       | ❌        |
+| Delete    | Store           | ✅              | ❌                       | ❌        |
+| Create    | Product         | ✅              | ✅ (own)                 | ❌        |
+| Update    | Product         | ✅              | ✅ (own)                 | ❌        |
+| Delete    | Product         | ✅              | ✅ (own)                 | ❌        |
+| View      | Product         | ✅              | ✅                       | ✅        |
+| Create    | User (Customer) | ✅              | ❌                       | ✅ (self) |
+| Update    | User (Customer) | ✅              | ❌                       | ✅ (self) |
+| Delete    | User (Customer) | ✅              | ❌                       | ✅ (self) |
+
+**Note:** Vendors can only update their own password. All other vendor fields (email, name, company, phone) can only be updated by admin.
 
 ### How It Works
 
