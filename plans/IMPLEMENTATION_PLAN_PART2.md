@@ -1334,7 +1334,7 @@ SENDGRID_API_KEY=your-api-key
 
 ---
 
-### 7.9 Category API
+### 7.8 Category API
 
 #### 7.8.1 Create Category Controllers
 
@@ -1372,16 +1372,16 @@ SENDGRID_API_KEY=your-api-key
 
 ---
 
-### 7.9 Search API
+### 7.10 Search API
 
-#### 7.9.1 Create Search Controllers
+#### 7.10.1 Create Search Controllers
 
 - [ ] Create `search.controller.ts`
   - [ ] `searchProducts()` - Search products
   - [ ] `searchStores()` - Search stores
   - [ ] `getSuggestions()` - Get search suggestions
 
-#### 7.9.2 Create Search Services
+#### 7.10.2 Create Search Services
 
 - [ ] Create `search.service.ts`
   - [ ] `searchProducts()` - Full-text search for products
@@ -1389,7 +1389,7 @@ SENDGRID_API_KEY=your-api-key
   - [ ] `getSuggestions()` - Get autocomplete suggestions
   - [ ] Implement search indexing
 
-#### 7.9.3 Create Search Routes
+#### 7.10.3 Create Search Routes
 
 - [ ] Create `search.routes.ts`
   - [ ] GET `/search/products` - Search products (public)
@@ -1398,9 +1398,9 @@ SENDGRID_API_KEY=your-api-key
 
 ---
 
-### 7.10 File Upload
+### 7.11 File Upload
 
-#### 7.10.1 Configure File Upload
+#### 7.11.1 Configure File Upload
 
 - [ ] Set up multer middleware
 - [ ] Configure storage (local or cloud)
@@ -1410,9 +1410,9 @@ SENDGRID_API_KEY=your-api-key
 
 ---
 
-### 7.11 Error Handling & Logging
+### 7.12 Error Handling & Logging
 
-#### 7.11.1 Create Error Handlers
+#### 7.12.1 Create Error Handlers
 
 - [ ] Create `error.middleware.ts`
   - [ ] Handle validation errors
@@ -1422,7 +1422,7 @@ SENDGRID_API_KEY=your-api-key
   - [ ] Handle server errors
   - [ ] Format error responses
 
-#### 7.11.2 Create Logger
+#### 7.12.2 Create Logger
 
 - [ ] Create `logger.service.ts`
   - [ ] Log requests
