@@ -767,15 +767,15 @@
 
 - [ ] Create `vendors` table
   - [ ] id (UUID, primary key)
-  - [ ] companyName (not null)
   - [ ] email (unique, not null)
   - [ ] password (hashed, not null)
   - [ ] name (not null)
+  - [ ] companyName (not null)
   - [ ] phone (nullable)
-  - [ ] role (enum: customer, vendor, admin)
   - [ ] isActive (boolean, default true)
   - [ ] createdAt (timestamp)
   - [ ] updatedAt (timestamp)
+  - [ ] **Note:** Vendors are separate entities with their own authentication, NOT linked to users table
 
 #### 7.2.3 Create Store Tables
 
@@ -792,6 +792,12 @@
   - [ ] createdAt (timestamp)
   - [ ] updatedAt (timestamp)
 
+**Store URL Field Clarification:**
+- [ ] Products are stored in YOUR database and managed by vendors through the Vendor app
+- [ ] The `url` field is REQUIRED and used to embed an external website via iframe on the store page
+- [ ] The store page displays the external iframe showing the vendor's website
+- [ ] This allows vendors to showcase their existing website through the platform
+
 #### 7.2.4 Create Product Tables
 
 - [ ] Create `products` table
@@ -799,7 +805,7 @@
   - [ ] id (UUID, primary key)
   - [ ] name (not null)
   - [ ] description (text, nullable)
-  - [ ] img (text (url), not null)
+  - [ ] images (JSON array of strings, nullable) - Stores URLs or server paths to images
   - [ ] price (decimal, not null)
   - [ ] comparePrice (decimal, nullable)
   - [ ] storeId (foreign key to stores)
@@ -807,6 +813,8 @@
   - [ ] isActive (boolean, default true)
   - [ ] createdAt (timestamp)
   - [ ] updatedAt (timestamp)
+  - [ ] **Note:** Images can be either external URLs or server file paths (e.g., `/uploads/products/image.jpg`)
+  - [ ] **Note:** Images are stored in server folder, not in database. JSON array stores the paths/URLs
 
 #### 7.2.5 Create Category Tables
 
@@ -833,13 +841,77 @@
 - [ ] Create `audit_logs` table
   - [ ] id (UUID, primary key)
   - [ ] userId (foreign key to users, nullable)
-  - [ ] action (not null)
-  - [ ] entity (not null)
+  - [ ] action (not null) - CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+  - [ ] entity (not null) - vendor, store, product, user, category
   - [ ] entityId (UUID, nullable)
-  - [ ] changes (JSON, nullable)
+  - [ ] changes (JSON, nullable) - Before/after values for updates
   - [ ] ipAddress (nullable)
   - [ ] userAgent (nullable)
   - [ ] createdAt (timestamp)
+
+#### 7.2.8 Audit Log Implementation
+
+**Purpose:**
+- Track all CRUD operations for compliance and security
+- Monitor user activities
+- Provide audit trail for troubleshooting
+- Meet regulatory requirements (GDPR, etc.)
+
+**What to Log:**
+- [ ] Vendor CRUD operations (admin only)
+- [ ] Store CRUD operations (admin only)
+- [ ] Product CRUD operations (vendor and admin)
+- [ ] User CRUD operations (admin and self-service)
+- [ ] Category CRUD operations (admin only)
+- [ ] Login attempts (successful and failed)
+- [ ] Logout events
+- [ ] Password changes
+- [ ] Account deletions
+
+**Audit Log Middleware:**
+- [ ] Create `audit.middleware.ts`
+  - [ ] Capture request details (user, IP, user agent)
+  - [ ] Capture action type (CREATE, UPDATE, DELETE)
+  - [ ] Capture entity type and ID
+  - [ ] For updates: capture before and after values
+  - [ ] Write to audit_logs table asynchronously
+  - [ ] Handle logging errors gracefully (don't block requests)
+
+**Audit Log Service:**
+- [ ] Create `audit.service.ts`
+  - [ ] `logAction(userId, action, entity, entityId, changes, ipAddress, userAgent)`
+  - [ ] `getAuditLogs(filters)` - Query audit logs with pagination
+  - [ ] `getEntityAuditHistory(entity, entityId)` - Get history for specific entity
+  - [ ] `getUserAuditHistory(userId)` - Get user's activity history
+  - [ ] `exportAuditLogs(startDate, endDate)` - Export for compliance
+
+**When to Log:**
+- **CREATE:** After successful creation
+- **UPDATE:** After successful update (include before/after values)
+- **DELETE:** Before deletion (capture final state)
+- **LOGIN:** After successful authentication
+- **LOGOUT:** When user logs out
+- **FAILED_LOGIN:** After failed login attempt
+
+**Audit Log Retention:**
+- [ ] Keep audit logs for 7 years (regulatory compliance)
+- [ ] Implement log rotation/archiving
+- [ ] Compress old logs
+- [ ] Separate storage for archived logs
+
+**Security Considerations:**
+- [ ] Audit logs are append-only (no updates or deletes)
+- [ ] Only admins can view audit logs
+- [ ] Sensitive data (passwords) never logged
+- [ ] IP addresses anonymized after 90 days (GDPR)
+- [ ] Regular backup of audit logs
+
+**Admin Audit Log Viewer:**
+- [ ] Create admin endpoint: GET `/admin/audit-logs`
+- [ ] Filter by: user, action, entity, date range
+- [ ] Pagination support
+- [ ] Export to CSV/JSON
+- [ ] Search functionality
 
 ---
 
@@ -881,6 +953,8 @@
   - [ ] `verifyToken()` - Verify JWT token
   - [ ] `generateResetToken()` - Generate password reset token
   - [ ] `sendResetEmail()` - Send password reset email
+  - [ ] `verifyGoogleToken()` - Verify Google OAuth token with Google API
+  - [ ] `findOrCreateGoogleUser()` - Find existing user or create new from Google profile
 
 #### 7.3.4 Create Auth Routes
 
@@ -894,32 +968,112 @@
   - [ ] POST `/auth/update-password` - Update password
   - [ ] POST `/auth/google` - Google OAuth endpoint
 
+#### 7.3.5 Google OAuth Implementation Details
+
+**Prerequisites:**
+
+- [ ] Create Google Cloud Project at console.cloud.google.com
+- [ ] Enable Google+ API
+- [ ] Create OAuth 2.0 credentials (Client ID and Client Secret)
+- [ ] Add authorized redirect URIs for all apps
+- [ ] Store credentials in environment variables
+
+**Frontend Implementation (All Apps):**
+
+- [ ] Install Google OAuth library: `@react-oauth/google`
+- [ ] Wrap app with GoogleOAuthProvider
+- [ ] Create GoogleSignInButton component using GoogleLogin
+- [ ] Handle credential response (JWT token from Google)
+- [ ] Send Google token to backend `/auth/google` endpoint
+- [ ] Store returned JWT tokens using react-auth-kit
+- [ ] Redirect user based on role
+
+**Backend Implementation:**
+
+- [ ] Install google-auth-library: `npm install google-auth-library`
+- [ ] Create POST `/auth/google` endpoint
+- [ ] Verify Google token using google-auth-library
+- [ ] Extract user profile (email, name, picture) from verified token
+- [ ] Check if user exists in database by email
+- [ ] If user exists: Generate JWT tokens and return
+- [ ] If user doesn't exist: Create new user with role=customer
+- [ ] Set random password (user won't use it, Google OAuth only)
+- [ ] Generate JWT tokens and return
+- [ ] Handle errors (invalid token, network issues)
+
+**Google OAuth Flow:**
+
+1. User clicks "Sign in with Google" button
+2. Google OAuth popup opens
+3. User selects Google account and grants permissions
+4. Google returns credential (JWT token) to frontend
+5. Frontend sends credential to backend `/auth/google`
+6. Backend verifies token with Google API
+7. Backend finds or creates user
+8. Backend generates JWT access and refresh tokens
+9. Frontend stores tokens using react-auth-kit
+10. User redirected to appropriate dashboard
+
+**Security Considerations:**
+
+- [ ] Verify token signature with Google
+- [ ] Check token expiration
+- [ ] Validate token audience matches your Client ID
+- [ ] Use HTTPS only
+- [ ] Store Client Secret securely (backend only)
+- [ ] Never expose Client Secret to frontend
+- [ ] Implement rate limiting on OAuth endpoint
+
+**Environment Variables Required:**
+
+```
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-client-secret
+```
+
+**Supported Apps:**
+
+- Mall App: Customer registration and login via Google
+- Vendor App: Optional (can be added later)
+- Admin App: Not recommended (use email/password for security)
+
 ---
 
 ## 📊 COMPLETE CRUD PERMISSION MATRIX
 
-| Operation                      | Entity          | Admin           | Vendor                   | Customer        |
-| ------------------------------ | --------------- | --------------- | ------------------------ | --------------- |
-| **VENDOR MANAGEMENT**          |
-| Create                         | Vendor          | ✅              | ❌                       | ❌              |
-| Read                           | Vendor          | ✅ (all)        | ✅ (self only)           | ❌              |
-| Update                         | Vendor          | ✅ (all fields) | ✅ (password only, self) | ❌              |
-| Delete                         | Vendor          | ✅              | ❌                       | ❌              |
-| **STORE MANAGEMENT**           |
-| Create                         | Store           | ✅              | ❌                       | ❌              |
-| Read                           | Store           | ✅ (all)        | ✅ (assigned only)       | ✅ (all public) |
-| Update                         | Store           | ✅              | ❌                       | ❌              |
-| Delete                         | Store           | ✅              | ❌                       | ❌              |
-| **PRODUCT MANAGEMENT**         |
-| Create                         | Product         | ✅              | ✅ (own only)            | ❌              |
-| Read                           | Product         | ✅ (all)        | ✅ (own only)            | ✅ (all public) |
-| Update                         | Product         | ✅ (all)        | ✅ (own only)            | ❌              |
-| Delete                         | Product         | ✅ (all)        | ✅ (own only)            | ❌              |
-| **USER (CUSTOMER) MANAGEMENT** |
-| Create                         | User (Customer) | ✅              | ❌                       | ✅ (self)       |
-| Read                           | User (Customer) | ✅ (all)        | ❌                       | ✅ (self)       |
-| Update                         | User (Customer) | ✅ (all)        | ❌                       | ✅ (self)       |
-| Delete                         | User (Customer) | ✅ (all)        | ❌                       | ✅ (self)       |
+**Terminology Note:**
+
+- **User** = Database table name (`users`)
+- **Customer** = Role/context (mall app users with role='customer')
+- API endpoints use `/users`, documentation uses "Customer" for clarity
+
+| Operation               | Entity               | Admin           | Vendor                   | Customer        |
+| ----------------------- | -------------------- | --------------- | ------------------------ | --------------- |
+| **VENDOR MANAGEMENT**   |
+| Create                  | Vendor               | ✅              | ❌                       | ❌              |
+| Read                    | Vendor               | ✅ (all)        | ✅ (self only)           | ❌              |
+| Update                  | Vendor               | ✅ (all fields) | ✅ (password only, self) | ❌              |
+| Delete                  | Vendor               | ✅              | ❌                       | ❌              |
+| **STORE MANAGEMENT**    |
+| Create                  | Store                | ✅              | ❌                       | ❌              |
+| Read                    | Store                | ✅ (all)        | ✅ (assigned only)       | ✅ (all public) |
+| Update                  | Store                | ✅              | ❌                       | ❌              |
+| Delete                  | Store                | ✅              | ❌                       | ❌              |
+| **PRODUCT MANAGEMENT**  |
+| Create                  | Product              | ✅              | ✅ (own only)            | ❌              |
+| Read                    | Product              | ✅ (all)        | ✅ (own only)            | ✅ (all public) |
+| Update                  | Product              | ✅ (all)        | ✅ (own only)            | ❌              |
+| Delete                  | Product              | ✅ (all)        | ✅ (own only)            | ❌              |
+| **CUSTOMER MANAGEMENT** |
+| Create                  | User (role=customer) | ✅              | ❌                       | ✅ (self)       |
+| Read                    | User (role=customer) | ✅ (all)        | ❌                       | ✅ (self)       |
+| Update                  | User (role=customer) | ✅ (all)        | ❌                       | ✅ (self)       |
+| Delete                  | User (role=customer) | ✅ (all)        | ❌                       | ✅ (self)       |
+| **CATEGORY MANAGEMENT** |
+| Create                  | Category             | ✅              | ❌                       | ❌              |
+| Read                    | Category             | ✅              | ✅                       | ✅              |
+| Update                  | Category             | ✅              | ❌                       | ❌              |
+| Delete                  | Category             | ✅              | ❌                       | ❌              |
 
 ### 7.4 Vendor API
 
@@ -1074,7 +1228,6 @@
   - [ ] `findById()` - Find user by ID
   - [ ] `update()` - Update user
   - [ ] `delete()` - Delete user
-  - [ ] `uploadAvatar()` - Handle avatar upload
 
 #### 7.7.3 Create User Validators
 
@@ -1096,7 +1249,92 @@
 
 ---
 
-### 7.8 Category API
+### 7.8 Email Notification Service
+
+#### 7.8.1 Setup Email Service
+
+- [ ] Install email library: `nodemailer` or `@sendgrid/mail`
+- [ ] Configure email service provider (SendGrid, AWS SES, or SMTP)
+- [ ] Create email templates directory
+- [ ] Set up environment variables for email configuration
+
+#### 7.8.2 Create Email Templates
+
+- [ ] Create `templates/welcome-email.html`
+
+  - [ ] Welcome message for new customers
+  - [ ] Platform introduction
+  - [ ] Getting started guide link
+
+- [ ] Create `templates/vendor-credentials.html`
+
+  - [ ] Vendor account created notification
+  - [ ] Login credentials (email and temporary password)
+  - [ ] Link to vendor dashboard
+  - [ ] Instructions to change password
+
+- [ ] Create `templates/password-reset.html`
+
+  - [ ] Password reset request confirmation
+  - [ ] Reset link with token (expires in 1 hour)
+  - [ ] Security notice
+
+- [ ] Create `templates/password-changed.html`
+
+  - [ ] Password successfully changed notification
+  - [ ] Security alert
+  - [ ] Contact support if not initiated by user
+
+- [ ] Create `templates/account-deleted.html`
+  - [ ] Account deletion confirmation
+  - [ ] Data removal notice
+  - [ ] Feedback request (optional)
+
+#### 7.8.3 Create Email Service
+
+- [ ] Create `email.service.ts`
+  - [ ] `sendEmail(to, subject, html)` - Generic email sender
+  - [ ] `sendWelcomeEmail(user)` - Send welcome email to new customers
+  - [ ] `sendVendorCredentials(vendor, password)` - Send credentials to new vendor
+  - [ ] `sendPasswordResetEmail(user, resetToken)` - Send password reset link
+  - [ ] `sendPasswordChangedEmail(user)` - Notify password change
+  - [ ] `sendAccountDeletedEmail(user)` - Confirm account deletion
+  - [ ] Handle email sending errors gracefully
+  - [ ] Log email sending attempts
+
+#### 7.8.4 Email Configuration
+
+**Environment Variables:**
+
+```
+EMAIL_SERVICE=sendgrid
+EMAIL_FROM=noreply@yourplatform.com
+EMAIL_FROM_NAME=Your Platform Name
+SENDGRID_API_KEY=your-api-key
+```
+
+**When to Send Emails:**
+
+- Customer registers → Send welcome email
+- Admin creates vendor → Send vendor credentials
+- User requests password reset → Send reset link
+- User changes password → Send confirmation
+- User deletes account → Send confirmation
+
+**Email Best Practices:**
+
+- [ ] Use responsive HTML templates
+- [ ] Include plain text alternative
+- [ ] Add unsubscribe link (for marketing emails)
+- [ ] Use clear subject lines
+- [ ] Include company branding
+- [ ] Test emails before deployment
+- [ ] Handle bounced emails
+- [ ] Implement rate limiting
+
+---
+
+### 7.9 Category API
 
 #### 7.8.1 Create Category Controllers
 

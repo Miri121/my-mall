@@ -347,20 +347,19 @@ graph LR
 
 ```mermaid
 erDiagram
-    USERS ||--o{ VENDORS : "has role"
     USERS ||--o{ REFRESH_TOKENS : "has"
     USERS ||--o{ AUDIT_LOGS : "creates"
     VENDORS ||--o{ STORES : "owns"
     STORES ||--o{ PRODUCTS : "contains"
     CATEGORIES ||--o{ PRODUCTS : "categorizes"
     CATEGORIES ||--o{ CATEGORIES : "parent-child"
-    PRODUCTS ||--o{ PRODUCT_IMAGES : "has"
 
     USERS {
         uuid id PK
         string email UK
         string password
         string name
+        string phone
         enum role
         string avatar
         boolean isActive
@@ -370,9 +369,12 @@ erDiagram
 
     VENDORS {
         uuid id PK
-        uuid userId FK
-        string company
+        string email UK
+        string password
+        string name
+        string companyName
         string phone
+        boolean isActive
         timestamp createdAt
         timestamp updatedAt
     }
@@ -381,6 +383,7 @@ erDiagram
         uuid id PK
         string name
         string slug UK
+        text url
         text description
         string logo
         string coverImage
@@ -394,22 +397,14 @@ erDiagram
         uuid id PK
         string name
         text description
+        json images
         decimal price
         decimal comparePrice
-        integer stock
         uuid storeId FK
         uuid categoryId FK
         boolean isActive
         timestamp createdAt
         timestamp updatedAt
-    }
-
-    PRODUCT_IMAGES {
-        uuid id PK
-        uuid productId FK
-        string url
-        integer order
-        timestamp createdAt
     }
 
     CATEGORIES {
@@ -442,6 +437,12 @@ erDiagram
         timestamp createdAt
     }
 ```
+
+**Key Changes:**
+- **VENDORS:** Now independent entity with own authentication (no userId FK)
+- **PRODUCTS:** Images stored as JSON array of URLs/paths (no separate PRODUCT_IMAGES table)
+- **STORES:** Added `url` field for external store website
+- **PRODUCTS:** Added `stock` field for inventory management
 
 ---
 

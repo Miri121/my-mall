@@ -189,6 +189,30 @@ Covers:
 - RTL support for Hebrew
 - Easy to add more languages
 
+### 📖 Terminology Clarification
+
+**User vs Customer:**
+
+- **User** - Generic term for the database table (users) that stores all customer accounts
+- **Customer** - Specific role/context term for mall app users (role-based)
+- **API Endpoints:** Use /users for the database table endpoints
+- **Documentation:** Use "Customer" when referring to the role/user type in business context
+- **Code:** Use "User" for database models, "Customer" for role-specific logic
+
+**Example:**
+
+- Database: users table with role field (customer, admin)
+- API: GET /users, POST /users/me
+- Business Logic: "Customer can create their own account"
+- UI: "Customer Dashboard", "Customer Profile"
+
+**External Store Feature:**
+
+- **Products:** Stored in YOUR database, managed by vendors through Vendor app
+- **Store URL:** Required field in stores table to embed external website via iframe
+- **Store Page:** Displays the external iframe showing the vendor's website
+- **Use Case:** Vendor showcases their existing website through the platform
+
 ---
 
 ## Project Structure
