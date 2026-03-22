@@ -7,6 +7,521 @@
 
 ## Phase 6: Application Development (Continued)
 
+### 6.1 Mall App (apps/mall) - Customer-Facing Application
+
+#### 6.1.1 Setup TanStack Router
+
+- [ ] Install TanStack Router in mall app
+- [ ] Create `routes/` directory
+- [ ] Configure router in `main.tsx`
+- [ ] Set up QueryClient provider
+- [ ] Set up AuthProvider
+- [ ] Set up i18n provider
+- [ ] Set up Toaster for notifications
+
+#### 6.1.2 Create Route Files (Mall App)
+
+**Location:** `apps/mall/src/routes/`
+
+**Public Routes (No Authentication):**
+
+- [ ] Create `__root.tsx` - Root layout
+
+  - **Permission:** Public
+  - **Components:** MallHeader, MallFooter, Toaster
+  - **Providers:** QueryClient, AuthProvider, i18n
+
+- [ ] Create `index.tsx` - Homepage
+
+  - **Permission:** Public
+  - **Components:** HomePage, FeaturedStores, PopularProducts, SearchBar
+  - **Data:** Featured stores, popular products (TanStack Query)
+  - **Actions:** Browse, search, view details
+
+- [ ] Create `login.tsx` - Login page
+
+  - **Permission:** Public
+  - **Components:** LoginForm, GoogleOAuthButton
+  - **Redirect:** After login → `/` (stores page)
+
+- [ ] Create `register.tsx` - Registration page
+
+  - **Permission:** Public
+  - **CRUD:** Create (customer self-registration)
+  - **Components:** RegisterForm, GoogleOAuthButton
+  - **Fields:** name, email, password, confirmPassword
+  - **Validation:** Zod schema
+  - **Success:** Auto-login + redirect to `/` + toast
+
+- [ ] Create `forgot-password.tsx` - Forgot password
+
+  - **Permission:** Public
+  - **Components:** ForgotPasswordForm
+
+- [ ] Create `reset-password/$token.tsx` - Reset password
+  - **Permission:** Public
+  - **Components:** ResetPasswordForm
+
+**Store Routes (Public):**
+
+- [ ] Create `stores/index.tsx` - Stores list
+
+  - **Permission:** Public
+  - **CRUD:** Read (all active stores)
+  - **Components:** StoreList, StoreCard, SearchBar, Filters
+  - **Data:** All stores with pagination
+  - **Actions:** View store, search, filter
+
+- [ ] Create `stores/$storeSlug.tsx` - Store detail
+  - **Permission:** Public
+  - **CRUD:** Read (single store)
+  - **Components:** StoreDetail, ExternalStoreIframe
+  - **Data:** Store info + external API iframe
+  - **Note:** Hosts external website with store products
+
+**Product Routes (Public):**
+
+- [ ] Create `products/index.tsx` - Products list
+
+  - **Permission:** Public
+  - **CRUD:** Read (all products)
+  - **Components:** ProductList, ProductCard, SearchBar, Filters
+  - **Filters:** Category, price range, store
+  - **Actions:** View details, add to favorites
+
+- [ ] Create `products/$productId.tsx` - Product detail
+  - **Permission:** Public
+  - **CRUD:** Read (single product)
+  - **Components:** ProductDetail, StoreInfo, RelatedProducts
+  - **Actions:** View details, add to favorites, view store
+
+**Search Route (Public):**
+
+- [ ] Create `search.tsx` - Search results
+  - **Permission:** Public
+  - **CRUD:** Read (search results)
+  - **Components:** SearchResults, Filters
+  - **Query Params:** `?q=query&category=&priceMin=&priceMax=`
+  - **Results:** Products with store labels (clickable)
+
+**Protected Routes (Customer Authentication Required):**
+
+- [ ] Create `account/index.tsx` - Account dashboard
+
+  - **Permission:** Customer only (Role.CUSTOMER)
+  - **CRUD:** Read (self)
+  - **Components:** AccountDashboard
+  - **Sections:** Profile, Favorites, History, Preferences
+
+- [ ] Create `account/profile.tsx` - Profile management
+
+  - **Permission:** Customer only (Role.CUSTOMER)
+  - **CRUD:** Read, Update (self)
+  - **Components:** ProfileForm
+  - **Fields:** name, email, phone
+  - **Validation:** Zod schema
+  - **Success:** Toast + cache update (setQueryData)
+
+- [ ] Create `account/password.tsx` - Change password
+
+  - **Permission:** Customer only (Role.CUSTOMER)
+  - **CRUD:** Update (self password)
+  - **Components:** ChangePasswordForm
+  - **Fields:** currentPassword, newPassword, confirmPassword
+  - **Success:** Toast notification
+
+- [ ] Create `account/preferences.tsx` - User preferences
+
+  - **Permission:** Customer only (Role.CUSTOMER)
+  - **CRUD:** Update (self preferences)
+  - **Components:** PreferencesForm
+  - **Fields:** language (en/he), theme (light/dark)
+  - **Storage:** Zustand + localStorage
+
+- [ ] Create `account/favorites.tsx` - Favorites list
+
+  - **Permission:** Customer only (Role.CUSTOMER)
+  - **CRUD:** Read (self favorites)
+  - **Components:** FavoritesList, ProductCard, StoreCard
+  - **Storage:** Zustand + localStorage
+  - **Actions:** Remove from favorites, view details
+
+- [ ] Create `account/history.tsx` - Browsing history
+
+  - **Permission:** Customer only (Role.CUSTOMER)
+  - **CRUD:** Read (self history)
+  - **Components:** HistoryList, ProductCard
+  - **Storage:** Customer domain library
+  - **Actions:** View product, clear history
+
+- [ ] Create `account/delete.tsx` - Delete account
+  - **Permission:** Customer only (Role.CUSTOMER)
+  - **CRUD:** Delete (self)
+  - **Components:** DeleteAccountForm, AlertDialog
+  - **Confirmation:** "Are you sure? This cannot be undone"
+  - **Success:** Logout + redirect to `/` + toast
+
+#### 6.1.3 Create Page Components (Mall App)
+
+- [ ] Create `HomePage.tsx`
+
+  - [ ] Featured stores section
+  - [ ] Popular products section
+  - [ ] Search bar
+  - [ ] Category navigation
+  - [ ] Integration with useStores, useProducts hooks
+
+- [ ] Create `StoresPage.tsx`
+
+  - [ ] Store list with cards
+  - [ ] Search and filters
+  - [ ] Pagination
+  - [ ] Integration with useStores hook
+
+- [ ] Create `StoreDetailPage.tsx`
+
+  - [ ] Store information
+  - [ ] External store iframe
+  - [ ] Integration with useStore hook
+
+- [ ] Create `ProductsPage.tsx`
+
+  - [ ] Product grid
+  - [ ] Search and filters
+  - [ ] Pagination
+  - [ ] Integration with useProducts hook
+
+- [ ] Create `ProductDetailPage.tsx`
+
+  - [ ] Product information
+  - [ ] Image gallery
+  - [ ] Store information
+  - [ ] Related products
+  - [ ] Add to favorites button
+  - [ ] Integration with useProduct hook
+
+- [ ] Create `SearchPage.tsx`
+
+  - [ ] Search results
+  - [ ] Filters
+  - [ ] Pagination
+  - [ ] Integration with useSearch hook
+
+- [ ] Create `AccountPage.tsx`
+
+  - [ ] Account dashboard
+  - [ ] Quick links
+  - [ ] Recent activity
+  - [ ] Integration with useCurrentUser hook
+
+- [ ] Create `ProfilePage.tsx`
+
+  - [ ] Profile form
+  - [ ] Integration with useUpdateCurrentUser hook
+
+- [ ] Create `FavoritesPage.tsx`
+  - [ ] Favorites list
+  - [ ] Integration with useFavoritesStore (Zustand)
+
+#### 6.1.4 Create Mall-Specific Components
+
+- [ ] Create `MallHeader.tsx`
+
+  - [ ] Logo
+  - [ ] Navigation (Home, Stores, Products)
+  - [ ] Search bar
+  - [ ] User menu (if logged in)
+  - [ ] Login/Register buttons (if not logged in)
+  - [ ] Language switcher
+  - [ ] Theme toggle
+
+- [ ] Create `MallFooter.tsx`
+
+  - [ ] Links
+  - [ ] Copyright
+  - [ ] Social media
+
+- [ ] Create `StoreCard.tsx`
+
+  - [ ] Store image
+  - [ ] Store name
+  - [ ] Store description
+  - [ ] View store button
+
+- [ ] Create `ProductCard.tsx`
+  - [ ] Product image
+  - [ ] Product name
+  - [ ] Price
+  - [ ] Store name
+  - [ ] Add to favorites button
+
+#### 6.1.5 Configure Mall App
+
+- [ ] Update `vite.config.ts` with proper settings
+- [ ] Configure environment variables
+- [ ] Set up proxy for API calls
+- [ ] Configure build options
+- [ ] Set up dev server port (4200)
+
+#### 6.1.6 Add Mall-Specific Styling
+
+- [ ] Create `styles/globals.css` with Tailwind imports
+- [ ] Add mall-specific CSS variables
+- [ ] Configure theme colors
+- [ ] Add custom styles
+
+---
+
+### 6.2 Vendor App (apps/vendor) - Vendor Dashboard
+
+#### 6.2.1 Setup TanStack Router
+
+- [ ] Install TanStack Router in vendor app
+- [ ] Create `routes/` directory
+- [ ] Configure router in `main.tsx`
+- [ ] Set up QueryClient provider
+- [ ] Set up AuthProvider
+- [ ] Set up i18n provider
+- [ ] Set up Toaster for notifications
+
+#### 6.2.2 Create Route Files (Vendor App)
+
+**Location:** `apps/vendor/src/routes/`
+
+**Public Routes:**
+
+- [ ] Create `login.tsx` - Login page
+
+  - **Permission:** Public
+  - **Components:** LoginForm
+  - **Redirect:** After login → `/dashboard`
+
+- [ ] Create `forgot-password.tsx` - Forgot password
+
+  - **Permission:** Public
+  - **Components:** ForgotPasswordForm
+
+- [ ] Create `reset-password/$token.tsx` - Reset password
+  - **Permission:** Public
+  - **Components:** ResetPasswordForm
+
+**Protected Routes (Vendor Authentication Required):**
+
+- [ ] Create `__root.tsx` - Root layout
+
+  - **Permission:** Authenticated
+  - **Components:** VendorHeader, VendorSidebar, VendorFooter, Toaster
+  - **Providers:** QueryClient, AuthProvider, i18n
+
+- [ ] Create `index.tsx` - Redirect to dashboard
+
+  - **Permission:** Vendor only
+  - **Action:** Redirect to `/dashboard`
+
+- [ ] Create `dashboard.tsx` - Vendor dashboard
+  - **Permission:** Vendor only (Role.VENDOR)
+  - **CRUD:** Read (self stats)
+  - **Components:** VendorDashboard, StatCards, RecentProducts
+  - **Data:** Product count, assigned stores, performance metrics
+
+**Product Management Routes:**
+
+- [ ] Create `products/index.tsx` - Products list
+
+  - **Permission:** Vendor only (Role.VENDOR)
+  - **CRUD:** Read (own products only)
+  - **Components:** ProductList, SearchBar, Filters, Pagination
+  - **Filters:** By store, by category, by status
+  - **Actions:** Create, View, Edit, Delete (own products)
+
+- [ ] Create `products/new.tsx` - Create product
+
+  - **Permission:** Vendor only (Role.VENDOR)
+  - **CRUD:** Create (product in own stores)
+  - **Components:** ProductForm, StoreSelect
+  - **Fields:** name, description, price, comparePrice, images, category, stock, storeId
+  - **Validation:** Zod schema
+  - **Image Upload:** Drag & drop or file picker
+  - **Success:** Redirect to `/products` + toast
+  - **Note:** Product immediately visible in Mall app
+
+- [ ] Create `products/$productId.tsx` - Product detail
+
+  - **Permission:** Vendor only (Role.VENDOR)
+  - **CRUD:** Read (own product)
+  - **Components:** ProductDetail, StoreInfo
+  - **Validation:** Ownership check
+  - **Actions:** Edit, Delete (if owner)
+
+- [ ] Create `products/$productId/edit.tsx` - Edit product
+
+  - **Permission:** Vendor only (Role.VENDOR)
+  - **CRUD:** Update (own product only)
+  - **Components:** ProductForm (edit mode)
+  - **Validation:** Zod schema + ownership check
+  - **Confirmation:** AlertDialog
+  - **Success:** Redirect to `/products/$productId` + toast
+  - **Note:** Changes immediately visible in Mall app
+
+- [ ] Create `products/$productId/delete.tsx` - Delete product
+  - **Permission:** Vendor only (Role.VENDOR)
+  - **CRUD:** Delete (own product only)
+  - **Components:** DeleteConfirmDialog
+  - **Confirmation:** "Are you sure?"
+  - **Validation:** Ownership check
+  - **Success:** Redirect to `/products` + toast
+  - **Note:** Product removed from Mall app
+
+**Store Viewing Routes (READ ONLY):**
+
+- [ ] Create `stores/index.tsx` - Stores list (READ ONLY)
+
+  - **Permission:** Vendor only (Role.VENDOR)
+  - **CRUD:** Read (assigned stores only)
+  - **Components:** StoreList (read-only)
+  - **Data:** Stores assigned by admin
+  - **Actions:** View details only (NO edit, NO delete)
+
+- [ ] Create `stores/$storeId.tsx` - Store detail (READ ONLY)
+  - **Permission:** Vendor only (Role.VENDOR)
+  - **CRUD:** Read (assigned store)
+  - **Components:** StoreDetail (read-only), ProductList
+  - **Data:** Store info, store products
+  - **Actions:** View products only (NO edit store)
+
+**Account Management Routes:**
+
+- [ ] Create `account/index.tsx` - Vendor profile (READ ONLY)
+
+  - **Permission:** Vendor only (Role.VENDOR)
+  - **CRUD:** Read (self)
+  - **Components:** VendorProfile (read-only except password)
+  - **Display:** email, name, company, phone (READ ONLY)
+  - **Actions:** Change password only
+
+- [ ] Create `account/profile.tsx` - Profile view (READ ONLY)
+
+  - **Permission:** Vendor only (Role.VENDOR)
+  - **CRUD:** Read (self)
+  - **Components:** ProfileView (READ ONLY)
+  - **Fields:** email, name, company, phone (display only)
+  - **Note:** Vendor CANNOT edit these fields
+
+- [ ] Create `account/password.tsx` - Change password (ONLY EDITABLE)
+
+  - **Permission:** Vendor only (Role.VENDOR)
+  - **CRUD:** Update (self password ONLY)
+  - **Components:** ChangePasswordForm
+  - **Fields:** currentPassword, newPassword, confirmPassword
+  - **Validation:** Zod schema + server verification
+  - **Success:** Toast + email notification
+  - **Note:** This is the ONLY field vendor can update
+
+- [ ] Create `account/preferences.tsx` - Preferences
+  - **Permission:** Vendor only (Role.VENDOR)
+  - **CRUD:** Update (self preferences)
+  - **Components:** PreferencesForm
+  - **Fields:** language (en/he), theme (light/dark)
+  - **Storage:** Zustand + localStorage
+
+#### 6.2.3 Create Page Components (Vendor App)
+
+- [ ] Create `DashboardPage.tsx`
+
+  - [ ] Vendor dashboard
+  - [ ] Product statistics
+  - [ ] Assigned stores
+  - [ ] Performance metrics
+  - [ ] Recent products
+  - [ ] Integration with multiple hooks
+
+- [ ] Create `ProductsPage.tsx`
+
+  - [ ] Product list (own products only)
+  - [ ] Add product button
+  - [ ] Search and filters
+  - [ ] Integration with useProducts hook (filtered by vendor)
+
+- [ ] Create `CreateProductPage.tsx`
+
+  - [ ] Product form
+  - [ ] Store selection (if multiple)
+  - [ ] Image upload
+  - [ ] Integration with useCreateProduct hook
+
+- [ ] Create `ProductDetailPage.tsx`
+
+  - [ ] Product detail
+  - [ ] Store info
+  - [ ] Edit and delete buttons (if owner)
+  - [ ] Integration with useProduct hook
+
+- [ ] Create `EditProductPage.tsx`
+
+  - [ ] Product form (edit mode)
+  - [ ] Integration with useUpdateProduct hook
+
+- [ ] Create `StoresPage.tsx` (READ ONLY)
+
+  - [ ] Store list (assigned stores)
+  - [ ] View details button
+  - [ ] Integration with useStores hook (filtered by vendor)
+
+- [ ] Create `StoreDetailPage.tsx` (READ ONLY)
+
+  - [ ] Store detail (read-only)
+  - [ ] Store products
+  - [ ] Integration with useStore hook
+
+- [ ] Create `ProfilePage.tsx` (READ ONLY)
+
+  - [ ] Vendor profile (read-only)
+  - [ ] Change password button
+  - [ ] Integration with useCurrentVendor hook
+
+- [ ] Create `ChangePasswordPage.tsx`
+  - [ ] Change password form
+  - [ ] Integration with useUpdatePassword hook
+
+#### 6.2.4 Create Vendor-Specific Components
+
+- [ ] Create `VendorHeader.tsx`
+
+  - [ ] Logo
+  - [ ] Navigation (Dashboard, Products, Stores)
+  - [ ] User menu
+  - [ ] Language switcher
+  - [ ] Theme toggle
+
+- [ ] Create `VendorSidebar.tsx`
+
+  - [ ] Navigation links with icons
+  - [ ] Collapsible sections
+  - [ ] Active link highlighting
+  - [ ] Quick stats
+
+- [ ] Create `VendorFooter.tsx`
+  - [ ] Links
+  - [ ] Copyright
+  - [ ] Version info
+
+#### 6.2.5 Configure Vendor App
+
+- [ ] Update `vite.config.ts` with proper settings
+- [ ] Configure environment variables
+- [ ] Set up proxy for API calls
+- [ ] Configure build options
+- [ ] Set up dev server port (4201)
+
+#### 6.2.6 Add Vendor-Specific Styling
+
+- [ ] Create `styles/globals.css` with Tailwind imports
+- [ ] Add vendor-specific CSS variables
+- [ ] Configure theme colors (different from mall and admin)
+- [ ] Add custom styles
+
+---
+
 ### 6.3 Admin App (apps/admin) - Continued
 
 #### 6.3.1 Setup TanStack Router
@@ -293,7 +808,6 @@
   - [ ] createdAt (timestamp)
   - [ ] updatedAt (timestamp)
 
-
 #### 7.2.5 Create Category Tables
 
 - [ ] Create `categories` table
@@ -382,18 +896,43 @@
 
 ---
 
+## 📊 COMPLETE CRUD PERMISSION MATRIX
+
+| Operation                      | Entity          | Admin           | Vendor                   | Customer        |
+| ------------------------------ | --------------- | --------------- | ------------------------ | --------------- |
+| **VENDOR MANAGEMENT**          |
+| Create                         | Vendor          | ✅              | ❌                       | ❌              |
+| Read                           | Vendor          | ✅ (all)        | ✅ (self only)           | ❌              |
+| Update                         | Vendor          | ✅ (all fields) | ✅ (password only, self) | ❌              |
+| Delete                         | Vendor          | ✅              | ❌                       | ❌              |
+| **STORE MANAGEMENT**           |
+| Create                         | Store           | ✅              | ❌                       | ❌              |
+| Read                           | Store           | ✅ (all)        | ✅ (assigned only)       | ✅ (all public) |
+| Update                         | Store           | ✅              | ❌                       | ❌              |
+| Delete                         | Store           | ✅              | ❌                       | ❌              |
+| **PRODUCT MANAGEMENT**         |
+| Create                         | Product         | ✅              | ✅ (own only)            | ❌              |
+| Read                           | Product         | ✅ (all)        | ✅ (own only)            | ✅ (all public) |
+| Update                         | Product         | ✅ (all)        | ✅ (own only)            | ❌              |
+| Delete                         | Product         | ✅ (all)        | ✅ (own only)            | ❌              |
+| **USER (CUSTOMER) MANAGEMENT** |
+| Create                         | User (Customer) | ✅              | ❌                       | ✅ (self)       |
+| Read                           | User (Customer) | ✅ (all)        | ❌                       | ✅ (self)       |
+| Update                         | User (Customer) | ✅ (all)        | ❌                       | ✅ (self)       |
+| Delete                         | User (Customer) | ✅ (all)        | ❌                       | ✅ (self)       |
+
 ### 7.4 Vendor API
 
 #### 7.4.1 Create Vendor Controllers
 
 - [ ] Create `vendor.controller.ts`
   - [ ] `getVendors()` - Get all vendors (admin only)
-  - [ ] `getVendor()` - Get single vendor
+  - [ ] `getVendor()` - Get single vendor (admin / vendor self only)
   - [ ] `createVendor()` - Create vendor (admin only)
-  - [ ] `updateVendor()` - Update vendor (admin only)
+  - [ ] `updateVendor()` - Update vendor (admin / vendor self only password)
   - [ ] `deleteVendor()` - Delete vendor (admin only)
-  - [ ] `getVendorStores()` - Get vendor's stores
-  - [ ] `getVendorStats()` - Get vendor statistics
+  - [ ] `getVendorStores()` - Get vendor's stores (admin/ vendor self only)
+  - [ ] `getVendorStats()` - Get vendor statistics (admin only)
 
 #### 7.4.2 Create Vendor Services
 
@@ -417,12 +956,12 @@
 
 - [ ] Create `vendor.routes.ts`
   - [ ] GET `/vendors` - List vendors (admin only)
-  - [ ] GET `/vendors/:id` - Get vendor (admin/vendor)
+  - [ ] GET `/vendors/:id` - Get vendor (admin/vendor self only)
   - [ ] POST `/vendors` - Create vendor (admin only)
-  - [ ] PUT `/vendors/:id` - Update vendor (admin only)
+  - [ ] PUT `/vendors/:id` - Update vendor (admin / vendor self only password)
   - [ ] DELETE `/vendors/:id` - Delete vendor (admin only)
-  - [ ] GET `/vendors/:id/stores` - Get vendor stores
-  - [ ] GET `/vendors/:id/stats` - Get vendor stats
+  - [ ] GET `/vendors/:id/stores` - Get vendor stores (admin/ vendor self only)
+  - [ ] GET `/vendors/:id/stats` - Get vendor stats (admin only)
 
 ---
 
@@ -438,8 +977,6 @@
   - [ ] `updateStore()` - Update store (admin only)
   - [ ] `deleteStore()` - Delete store (admin only)
   - [ ] `getStoreProducts()` - Get store products
-  - [ ] `uploadLogo()` - Upload store logo
-  - [ ] `uploadCover()` - Upload store cover
 
 #### 7.5.2 Create Store Services
 
@@ -471,8 +1008,6 @@
   - [ ] PUT `/stores/:id` - Update store (admin only)
   - [ ] DELETE `/stores/:id` - Delete store (admin only)
   - [ ] GET `/stores/:id/products` - Get store products (public)
-  - [ ] POST `/stores/:id/logo` - Upload logo (admin only)
-  - [ ] POST `/stores/:id/cover` - Upload cover (admin only)
 
 ---
 
@@ -486,9 +1021,6 @@
   - [ ] `createProduct()` - Create product (vendor/admin)
   - [ ] `updateProduct()` - Update product (vendor/admin)
   - [ ] `deleteProduct()` - Delete product (vendor/admin)
-  - [ ] `uploadImages()` - Upload product images
-  - [ ] `deleteImage()` - Delete product image
-  - [ ] `updateStock()` - Update product stock
 
 #### 7.6.2 Create Product Services
 
@@ -519,9 +1051,6 @@
   - [ ] POST `/products` - Create product (vendor/admin)
   - [ ] PUT `/products/:id` - Update product (vendor/admin)
   - [ ] DELETE `/products/:id` - Delete product (vendor/admin)
-  - [ ] POST `/products/:id/images` - Upload images (vendor/admin)
-  - [ ] DELETE `/products/:id/images/:imageId` - Delete image (vendor/admin)
-  - [ ] PATCH `/products/:id/stock` - Update stock (vendor/admin)
 
 ---
 
@@ -537,7 +1066,6 @@
   - [ ] `updateCurrentUser()` - Update current user
   - [ ] `deleteUser()` - Delete user (admin only)
   - [ ] `deleteCurrentUser()` - Delete current user
-  - [ ] `uploadAvatar()` - Upload avatar
 
 #### 7.7.2 Create User Services
 
@@ -565,7 +1093,6 @@
   - [ ] PUT `/users/:id` - Update user (admin only)
   - [ ] DELETE `/users/me` - Delete current user (authenticated)
   - [ ] DELETE `/users/:id` - Delete user (admin only)
-  - [ ] POST `/users/me/avatar` - Upload avatar (authenticated)
 
 ---
 
@@ -642,14 +1169,6 @@
 - [ ] Set file size limits
 - [ ] Set allowed file types
 - [ ] Configure image processing (resize, compress)
-
-#### 7.10.2 Create Upload Service
-
-- [ ] Create `upload.service.ts`
-  - [ ] `uploadImage()` - Upload and process image
-  - [ ] `deleteImage()` - Delete image
-  - [ ] `generateThumbnail()` - Generate thumbnail
-  - [ ] `optimizeImage()` - Optimize image
 
 ---
 
