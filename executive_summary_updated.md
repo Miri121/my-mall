@@ -103,9 +103,10 @@ Everything lives in one codebase organized into folders:
 
 - **Authentication** - Login, logout, session management, role-based access control
 - **Vendors** - Everything related to managing vendor accounts (CRUD operations)
-  - Fields: id, email, password, name, company, phone, isActive, createdAt, updatedAt
+  - Fields: id, email, password, name, companyName, phone, isActive, createdAt, updatedAt
 - **Stores** - Everything related to managing stores (CRUD operations)
-  - Fields: id, name, slug, **url** (REQUIRED - external website URL for iframe), description, logo, coverImage, vendorId, isActive, createdAt, updatedAt
+  - Fields: id, name, slug, **url** (REQUIRED - external website URL for iframe embedding vendor's existing website), description, logo, coverImage, vendorId, isActive, createdAt, updatedAt
+  - **Store URL Purpose:** The `url` field stores the external website address that will be displayed via iframe on the store page. This allows vendors to showcase their existing website through the platform while products are managed separately in the database.
 - **Products** - Everything related to managing products (CRUD operations)
   - Fields: id, name, description, **images** (JSON array of URLs/paths), price, comparePrice, storeId, categoryId, isActive, createdAt, updatedAt
   - **Note:** Images are stored in server filesystem or cloud storage (S3/Cloudinary), database only stores the paths as JSON array
@@ -124,19 +125,30 @@ Everything lives in one codebase organized into folders:
 
 ## The Technology Stack Explained
 
-### Backend Architecture: NestJS Microservices
+### Backend Architecture: NestJS Microservices (7 Services)
 
-The backend is built using a microservices architecture with NestJS:
+The backend is built using a **7-service microservices architecture** with NestJS and RabbitMQ:
 
-- **API Gateway** - Single entry point for all client requests
-- **Admin Service** - Handles vendor, store, and user management
-- **Store Service** - Manages store operations and catalog
-- **Product Service** - Handles product CRUD operations
-- **Auth Service** - Authentication and authorization
-- **RabbitMQ** - Message broker for inter-service communication
-- **Event-driven architecture** - Services communicate via events
+**Core Services:**
+- **API Gateway (Port 3000)** - Single entry point for all client requests, JWT validation, rate limiting
+- **Vendor Service (Port 3001)** - Vendor CRUD operations, vendor profile management, vendor statistics
+- **User Service (Port 3002)** - Customer account management, user preferences, activity tracking
+- **Store Service (Port 3003)** - Store CRUD operations, store catalog management, store analytics
+- **Product Service (Port 3004)** - Product CRUD operations, category management, search and filtering
+- **Auth Service (Port 3005)** - Authentication (login, register, logout), JWT token management, OAuth integration
+- **Admin Service (Port 3006)** - Platform statistics, dashboard metrics, audit logs, system health monitoring
+
+**Message Broker:**
+- **RabbitMQ (Port 5672)** - Event-driven communication between services, ensures eventual consistency
+
+**Architecture Benefits:**
+- **Event-driven architecture** - Services communicate via events for loose coupling
 - **Independent deployment** - Each service can be deployed separately
-- **Scalability** - Scale services independently based on load
+- **Independent scaling** - Scale services based on individual load patterns
+- **Fault isolation** - Service failures don't cascade to other services
+- **Database per service** - Each service has its own database for data isolation
+
+> **📖 Detailed Architecture:** See [`plans/MICROSERVICES_ARCHITECTURE.md`](plans/MICROSERVICES_ARCHITECTURE.md) for complete backend architecture, service responsibilities, event flows, and deployment configuration.
 
 ### Authentication: react-auth-kit
 

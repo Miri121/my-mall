@@ -35,18 +35,22 @@ graph TB
 
     subgraph "Backend Microservices"
         Gateway[API Gateway<br/>Port 3000<br/>NestJS]
-        AdminService[Admin Service<br/>Port 3001<br/>NestJS]
-        StoreService[Store Service<br/>Port 3002<br/>NestJS]
-        ProductService[Product Service<br/>Port 3003<br/>NestJS]
-        AuthService[Auth Service<br/>Port 3004<br/>NestJS]
+        VendorService[Vendor Service<br/>Port 3001<br/>NestJS]
+        UserService[User Service<br/>Port 3002<br/>NestJS]
+        StoreService[Store Service<br/>Port 3003<br/>NestJS]
+        ProductService[Product Service<br/>Port 3004<br/>NestJS]
+        AuthService[Auth Service<br/>Port 3005<br/>NestJS]
+        AdminService[Admin Service<br/>Port 3006<br/>NestJS]
         RabbitMQ[RabbitMQ<br/>Port 5672<br/>Message Broker]
     end
 
     subgraph "Data Layer"
-        AdminDB[(Admin DB<br/>PostgreSQL)]
+        VendorDB[(Vendor DB<br/>PostgreSQL)]
+        UserDB[(User DB<br/>PostgreSQL)]
         StoreDB[(Store DB<br/>PostgreSQL)]
         ProductDB[(Product DB<br/>PostgreSQL)]
         AuthDB[(Auth DB<br/>PostgreSQL)]
+        AdminDB[(Admin DB<br/>PostgreSQL)]
         Storage[File Storage<br/>S3/Cloudinary]
     end
 
@@ -85,20 +89,26 @@ graph TB
     Admin --> I18n
 
     DataAccess --> Gateway
-    Gateway --> AdminService
+    Gateway --> VendorService
+    Gateway --> UserService
     Gateway --> StoreService
     Gateway --> ProductService
     Gateway --> AuthService
+    Gateway --> AdminService
 
-    AdminService --> RabbitMQ
+    VendorService --> RabbitMQ
+    UserService --> RabbitMQ
     StoreService --> RabbitMQ
     ProductService --> RabbitMQ
     AuthService --> RabbitMQ
+    AdminService --> RabbitMQ
 
-    AdminService --> AdminDB
+    VendorService --> VendorDB
+    UserService --> UserDB
     StoreService --> StoreDB
     ProductService --> ProductDB
     AuthService --> AuthDB
+    AdminService --> AdminDB
 
     ProductService --> Storage
     StoreService --> Storage
@@ -119,10 +129,12 @@ graph LR
     end
 
     subgraph "Microservices"
-        Admin[Admin Service<br/>Port 3001]
-        Store[Store Service<br/>Port 3002]
-        Product[Product Service<br/>Port 3003]
-        Auth[Auth Service<br/>Port 3004]
+        Vendor[Vendor Service<br/>Port 3001]
+        User[User Service<br/>Port 3002]
+        Store[Store Service<br/>Port 3003]
+        Product[Product Service<br/>Port 3004]
+        Auth[Auth Service<br/>Port 3005]
+        Admin[Admin Service<br/>Port 3006]
     end
 
     subgraph "Message Broker"
@@ -130,20 +142,26 @@ graph LR
     end
 
     Client -->|HTTP/REST| Gateway
-    Gateway -->|HTTP| Admin
+    Gateway -->|HTTP| Vendor
+    Gateway -->|HTTP| User
     Gateway -->|HTTP| Store
     Gateway -->|HTTP| Product
     Gateway -->|HTTP| Auth
+    Gateway -->|HTTP| Admin
 
-    Admin -.->|Events| RabbitMQ
+    Vendor -.->|Events| RabbitMQ
+    User -.->|Events| RabbitMQ
     Store -.->|Events| RabbitMQ
     Product -.->|Events| RabbitMQ
     Auth -.->|Events| RabbitMQ
+    Admin -.->|Events| RabbitMQ
 
-    RabbitMQ -.->|Subscribe| Admin
+    RabbitMQ -.->|Subscribe| Vendor
+    RabbitMQ -.->|Subscribe| User
     RabbitMQ -.->|Subscribe| Store
     RabbitMQ -.->|Subscribe| Product
     RabbitMQ -.->|Subscribe| Auth
+    RabbitMQ -.->|Subscribe| Admin
 ```
 
 ---
@@ -506,12 +524,13 @@ erDiagram
     }
 ```
 
-**Key Changes:**
+**Key Schema Notes:**
 
-- **VENDORS:** Now independent entity with own authentication (no userId FK)
-- **PRODUCTS:** Images stored as JSON array of URLs/paths (no separate PRODUCT_IMAGES table)
-- **STORES:** Added `url` field for external store website
-- **PRODUCTS:** Images stored as JSON array of URLs/paths
+- **VENDORS:** Independent entity with own authentication system (separate from users table, no userId FK)
+- **USERS:** Customer accounts with role field (customer, admin)
+- **STORES:** `url` field stores external website URL for iframe embedding
+- **PRODUCTS:** `images` field is JSON array storing URLs/paths (no separate PRODUCT_IMAGES table)
+- **CATEGORIES:** Self-referential with parentId for hierarchical categories
 
 ---
 

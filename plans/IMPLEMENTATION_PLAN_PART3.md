@@ -88,16 +88,39 @@
 
 #### 9.2.2 Create Docker Compose
 
+> **Reference:** See [`plans/MICROSERVICES_ARCHITECTURE.md`](./MICROSERVICES_ARCHITECTURE.md) lines 473-544 for complete Docker Compose template.
+
 - [ ] Create `docker-compose.yml` for development
 
-  - [ ] Service for Mall app
-  - [ ] Service for Vendor app
-  - [ ] Service for Admin app
-  - [ ] Service for API
-  - [ ] Service for PostgreSQL or MongoDB
-  - [ ] Service for Redis (if needed)
+  **Frontend Services:**
+  - [ ] Service for Mall app (port 4200)
+  - [ ] Service for Vendor app (port 4201)
+  - [ ] Service for Admin app (port 4202)
+  
+  **Backend Microservices:**
+  - [ ] Service for API Gateway (port 3000)
+  - [ ] Service for Vendor Service (port 3001)
+  - [ ] Service for User Service (port 3002)
+  - [ ] Service for Store Service (port 3003)
+  - [ ] Service for Product Service (port 3004)
+  - [ ] Service for Auth Service (port 3005)
+  - [ ] Service for Admin Service (port 3006)
+  
+  **Infrastructure:**
+  - [ ] Service for RabbitMQ (ports 5672, 15672)
+  - [ ] Service for vendor-db (PostgreSQL)
+  - [ ] Service for user-db (PostgreSQL)
+  - [ ] Service for store-db (PostgreSQL)
+  - [ ] Service for product-db (PostgreSQL)
+  - [ ] Service for auth-db (PostgreSQL)
+  - [ ] Service for admin-db (PostgreSQL)
+  - [ ] Service for Redis (optional, for caching)
+  
+  **Configuration:**
   - [ ] Volume mounts for hot reload
   - [ ] Network configuration
+  - [ ] Health checks for all services
+  - [ ] Depends_on relationships
 
 - [ ] Create `docker-compose.prod.yml` for production
   - [ ] Production-optimized services
@@ -105,6 +128,7 @@
   - [ ] Health checks
   - [ ] Restart policies
   - [ ] Resource limits
+  - [ ] Logging configuration
 
 ---
 

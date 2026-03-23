@@ -710,9 +710,11 @@
 
 ## Phase 7: Backend Microservices Development (NestJS + RabbitMQ)
 
-> **Architecture Change:** The backend uses NestJS microservices architecture with RabbitMQ for inter-service communication instead of a monolithic Express.js API.
+> **Architecture:** The backend uses **7 NestJS microservices** with **RabbitMQ** for inter-service communication.
 >
 > **Reference:** See [`plans/MICROSERVICES_ARCHITECTURE.md`](./MICROSERVICES_ARCHITECTURE.md) for complete architecture details.
+
+---
 
 ### 7.1 Setup Microservices Infrastructure
 
@@ -733,7 +735,7 @@
 
 #### 7.1.2 Install Database and ORM
 
-- [ ] Install Prisma or TypeORM:
+- [ ] Install Prisma:
   - [ ] `@prisma/client`
   - [ ] `prisma`
   - [ ] `pg` (PostgreSQL driver)
@@ -745,12 +747,13 @@
 - [ ] Install RabbitMQ packages:
   - [ ] `amqplib`
   - [ ] `amqp-connection-manager`
-- [ ] Install NestJS microservices transport: Already included in `@nestjs/microservices`
+- [ ] NestJS microservices transport: Already included in `@nestjs/microservices`
 
 #### 7.1.4 Install Additional Dependencies
 
 - [ ] Install file upload: `multer`, `@nestjs/platform-express`
 - [ ] Install AWS SDK for S3: `@aws-sdk/client-s3` (optional)
+- [ ] Install Cloudinary SDK: `cloudinary` (optional)
 - [ ] Install compression: `compression`
 - [ ] Install helmet for security: `helmet`
 - [ ] Install CORS: Already included in NestJS
@@ -761,12 +764,12 @@
 
 - [ ] Create `apps/backend/` directory in Nx workspace
 - [ ] Generate API Gateway: `nx g @nx/nest:app api-gateway --directory=backend`
-- [ ] Generate Admin Service: `nx g @nx/nest:app admin-service --directory=backend`
 - [ ] Generate Vendor Service: `nx g @nx/nest:app vendor-service --directory=backend`
 - [ ] Generate User Service: `nx g @nx/nest:app user-service --directory=backend`
 - [ ] Generate Store Service: `nx g @nx/nest:app store-service --directory=backend`
 - [ ] Generate Product Service: `nx g @nx/nest:app product-service --directory=backend`
 - [ ] Generate Auth Service: `nx g @nx/nest:app auth-service --directory=backend`
+- [ ] Generate Admin Service: `nx g @nx/nest:app admin-service --directory=backend`
 
 #### 7.1.6 Configure RabbitMQ
 
@@ -775,19 +778,38 @@
   docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
   ```
 - [ ] Access RabbitMQ Management UI: http://localhost:15672 (guest/guest)
-- [ ] Create exchanges and queues for each service
+- [ ] Create exchanges for each service:
+  - [ ] `vendor.exchange` (topic)
+  - [ ] `user.exchange` (topic)
+  - [ ] `store.exchange` (topic)
+  - [ ] `product.exchange` (topic)
+  - [ ] `auth.exchange` (topic)
+  - [ ] `admin.exchange` (topic)
+- [ ] Create queues for each service:
+  - [ ] `vendor.events`
+  - [ ] `user.events`
+  - [ ] `store.events`
+  - [ ] `product.events`
+  - [ ] `auth.events`
+  - [ ] `admin.events`
 - [ ] Configure dead letter queues for error handling
+- [ ] Set up queue bindings with routing keys
 
 #### 7.1.7 Setup Docker Compose for Development
 
-- [ ] Create `docker-compose.yml` in workspace root
-- [ ] Add RabbitMQ service
-- [ ] Add PostgreSQL services (one per microservice)
+- [ ] Create `docker-compose.yml` in workspace root (see MICROSERVICES_ARCHITECTURE.md for template)
+- [ ] Add RabbitMQ service (ports 5672, 15672)
+- [ ] Add PostgreSQL services (one per microservice):
+  - [ ] vendor-db (vendor_db)
+  - [ ] user-db (user_db)
+  - [ ] store-db (store_db)
+  - [ ] product-db (product_db)
+  - [ ] auth-db (auth_db)
+  - [ ] admin-db (admin_db)
 - [ ] Add Redis for caching (optional)
 - [ ] Configure service networking
 - [ ] Add volume mounts for data persistence
-
----
+- [ ] Set up health checks for all services
 
 ---
 
@@ -841,23 +863,16 @@
 
 ---
 
-### 7.3 Database Schema (All Services)
+### 7.3 Database Schema (Database per Service)
 
-#### 7.3.1 Create User Tables (Admin Service DB)
+> **Important:** Each microservice has its own database for data isolation and independent scaling.
 
-- [ ] Create `users` table
-  - [ ] id (UUID, primary key)
-  - [ ] email (unique, not null)
-  - [ ] password (hashed, not null)
-  - [ ] name (not null)
-  - [ ] phone (nullable)
-  - [ ] role (enum: customer, vendor, admin)
-  - [ ] avatar (nullable)
-  - [ ] isActive (boolean, default true)
-  - [ ] createdAt (timestamp)
-  - [ ] updatedAt (timestamp)
+#### 7.3.1 Vendor Service Database (vendor_db)
 
-#### 7.2.2 Create Vendor Tables
+**Location:** Vendor Service (Port 3001)
+
+- [ ] Create Prisma schema for vendor_db
+- [ ] Create `vendors` table
 
 - [ ] Create `vendors` table
   - [ ] id (UUID, primary key)
@@ -871,47 +886,76 @@
   - [ ] updatedAt (timestamp)
   - [ ] **Note:** Vendors are separate entities with their own authentication, NOT linked to users table
 
-#### 7.2.3 Create Store Tables
+- [ ] Run Prisma migrations: `npx prisma migrate dev --name init`
+- [ ] Generate Prisma client: `npx prisma generate`
 
+#### 7.3.2 User Service Database (user_db)
+
+**Location:** User Service (Port 3002)
+
+- [ ] Create Prisma schema for user_db
+- [ ] Create `users` table
+  - [ ] id (UUID, primary key)
+  - [ ] email (unique, not null)
+  - [ ] password (hashed, not null)
+  - [ ] name (not null)
+  - [ ] phone (nullable)
+  - [ ] role (enum: customer, admin)
+  - [ ] avatar (nullable)
+  - [ ] isActive (boolean, default true)
+  - [ ] createdAt (timestamp)
+  - [ ] updatedAt (timestamp)
+
+- [ ] Run Prisma migrations: `npx prisma migrate dev --name init`
+- [ ] Generate Prisma client: `npx prisma generate`
+
+#### 7.3.3 Store Service Database (store_db)
+
+**Location:** Store Service (Port 3003)
+
+- [ ] Create Prisma schema for store_db
 - [ ] Create `stores` table
   - [ ] id (UUID, primary key)
   - [ ] name (not null)
   - [ ] slug (unique, not null)
-  - [ ] url (text, not null)
+  - [ ] url (text, nullable) - External website URL for iframe embedding
   - [ ] description (text, nullable)
   - [ ] logo (nullable)
   - [ ] coverImage (nullable)
-  - [ ] vendorId (foreign key to vendors)
+  - [ ] vendorId (UUID, not null) - Reference to vendor (no FK, cross-service)
   - [ ] isActive (boolean, default true)
+  - [ ] productCount (integer, default 0) - Denormalized for performance
   - [ ] createdAt (timestamp)
   - [ ] updatedAt (timestamp)
 
 **Store URL Field Clarification:**
+- [ ] Products are stored in Product Service database and managed by vendors
+- [ ] The `url` field is OPTIONAL and used to embed vendor's external website via iframe
+- [ ] The store page can display both: platform products AND external iframe
+- [ ] This allows vendors to showcase their existing website alongside platform products
 
-- [ ] Products are stored in YOUR database and managed by vendors through the Vendor app
-- [ ] The `url` field is REQUIRED and used to embed an external website via iframe on the store page
-- [ ] The store page displays the external iframe showing the vendor's website
-- [ ] This allows vendors to showcase their existing website through the platform
+- [ ] Run Prisma migrations: `npx prisma migrate dev --name init`
+- [ ] Generate Prisma client: `npx prisma generate`
 
-#### 7.2.4 Create Product Tables
+#### 7.3.4 Product Service Database (product_db)
 
+**Location:** Product Service (Port 3004)
+
+- [ ] Create Prisma schema for product_db
 - [ ] Create `products` table
-
   - [ ] id (UUID, primary key)
   - [ ] name (not null)
   - [ ] description (text, nullable)
-  - [ ] images (JSON array of strings, nullable) - Stores URLs or server paths to images
+  - [ ] images (JSON array of strings, nullable) - Stores URLs or server paths
   - [ ] price (decimal, not null)
   - [ ] comparePrice (decimal, nullable)
-  - [ ] storeId (foreign key to stores)
-  - [ ] categoryId (foreign key to categories, nullable)
+  - [ ] storeId (UUID, not null) - Reference to store (no FK, cross-service)
+  - [ ] categoryId (UUID, nullable) - Foreign key to categories
+  - [ ] vendorId (UUID, not null) - Reference to vendor (no FK, cross-service)
   - [ ] isActive (boolean, default true)
   - [ ] createdAt (timestamp)
   - [ ] updatedAt (timestamp)
-  - [ ] **Note:** Images can be either external URLs or server file paths (e.g., `/uploads/products/image.jpg`)
-  - [ ] **Note:** Images are stored in server folder, not in database. JSON array stores the paths/URLs
-
-#### 7.2.5 Create Category Tables
+  - [ ] **Note:** Images stored in S3/Cloudinary, database stores paths as JSON array
 
 - [ ] Create `categories` table
   - [ ] id (UUID, primary key)
@@ -922,20 +966,53 @@
   - [ ] createdAt (timestamp)
   - [ ] updatedAt (timestamp)
 
-#### 7.2.6 Create Session Tables
+- [ ] Run Prisma migrations: `npx prisma migrate dev --name init`
+- [ ] Generate Prisma client: `npx prisma generate`
+
+#### 7.3.5 Auth Service Database (auth_db)
+
+**Location:** Auth Service (Port 3005)
+
+- [ ] Create Prisma schema for auth_db
+- [ ] Create `credentials` table
+  - [ ] id (UUID, primary key)
+  - [ ] userId (UUID, nullable) - Reference to user
+  - [ ] vendorId (UUID, nullable) - Reference to vendor
+  - [ ] email (unique, not null)
+  - [ ] passwordHash (not null)
+  - [ ] role (enum: customer, vendor, admin)
+  - [ ] isActive (boolean, default true)
+  - [ ] lastLoginAt (timestamp, nullable)
+  - [ ] createdAt (timestamp)
+  - [ ] updatedAt (timestamp)
 
 - [ ] Create `refresh_tokens` table
   - [ ] id (UUID, primary key)
-  - [ ] userId (foreign key to users)
+  - [ ] credentialId (foreign key to credentials)
   - [ ] token (unique, not null)
   - [ ] expiresAt (timestamp)
   - [ ] createdAt (timestamp)
 
-#### 7.2.7 Create Audit Tables
+- [ ] Create `password_resets` table
+  - [ ] id (UUID, primary key)
+  - [ ] email (not null)
+  - [ ] token (unique, not null)
+  - [ ] expiresAt (timestamp)
+  - [ ] usedAt (timestamp, nullable)
+  - [ ] createdAt (timestamp)
 
+- [ ] Run Prisma migrations: `npx prisma migrate dev --name init`
+- [ ] Generate Prisma client: `npx prisma generate`
+
+#### 7.3.6 Admin Service Database (admin_db)
+
+**Location:** Admin Service (Port 3006)
+
+- [ ] Create Prisma schema for admin_db
 - [ ] Create `audit_logs` table
   - [ ] id (UUID, primary key)
-  - [ ] userId (foreign key to users, nullable)
+  - [ ] userId (UUID, nullable) - Reference to user
+  - [ ] vendorId (UUID, nullable) - Reference to vendor
   - [ ] action (not null) - CREATE, UPDATE, DELETE, LOGIN, LOGOUT
   - [ ] entity (not null) - vendor, store, product, user, category
   - [ ] entityId (UUID, nullable)
@@ -944,7 +1021,45 @@
   - [ ] userAgent (nullable)
   - [ ] createdAt (timestamp)
 
-#### 7.2.8 Audit Log Implementation
+- [ ] Create `platform_statistics` table
+  - [ ] id (UUID, primary key)
+  - [ ] date (date, unique)
+  - [ ] totalVendors (integer)
+  - [ ] totalUsers (integer)
+  - [ ] totalStores (integer)
+  - [ ] totalProducts (integer)
+  - [ ] activeVendors (integer)
+  - [ ] activeUsers (integer)
+  - [ ] createdAt (timestamp)
+  - [ ] updatedAt (timestamp)
+
+- [ ] Run Prisma migrations: `npx prisma migrate dev --name init`
+- [ ] Generate Prisma client: `npx prisma generate`
+
+#### 7.3.7 Cross-Service Data Synchronization
+
+**Important:** Since each service has its own database, data consistency is maintained through RabbitMQ events.
+
+- [ ] When Vendor Service creates a vendor:
+  - [ ] Publishes `vendor.created` event
+  - [ ] Auth Service subscribes and creates credentials
+  - [ ] Admin Service subscribes and updates statistics
+
+- [ ] When User Service creates a user:
+  - [ ] Publishes `user.created` event
+  - [ ] Auth Service subscribes and creates credentials
+  - [ ] Admin Service subscribes and updates statistics
+
+- [ ] When Store Service creates a store:
+  - [ ] Publishes `store.created` event
+  - [ ] Admin Service subscribes and updates statistics
+
+- [ ] When Product Service creates a product:
+  - [ ] Publishes `product.created` event
+  - [ ] Store Service subscribes and updates product count
+  - [ ] Admin Service subscribes and updates statistics
+
+#### 7.3.8 Audit Log Implementation (Admin Service)
 
 **Purpose:**
 
@@ -1073,6 +1188,8 @@
 
 #### 7.3.5 Google OAuth Implementation Details
 
+> **Note:** Frontend OAuth implementation should be done in Phase 3 (Authentication) or Phase 4 (Feature Libraries). This section covers both frontend and backend for completeness.
+
 **Prerequisites:**
 
 - [ ] Create Google Cloud Project at console.cloud.google.com
@@ -1150,6 +1267,12 @@ GOOGLE_CLIENT_SECRET=your-client-secret
 - **Customer** = Role/context (mall app users with role='customer')
 - API endpoints use `/users`, documentation uses "Customer" for clarity
 
+**Vendor Update Clarification:**
+
+Vendors have TWO separate update endpoints:
+- `PUT /api/vendors/:id` - Admin only (can update all fields: email, name, company, phone)
+- `PUT /api/vendors/me/password` - Vendor self only (can only update own password)
+
 | Operation               | Entity               | Admin           | Vendor                   | Customer        |
 | ----------------------- | -------------------- | --------------- | ------------------------ | --------------- |
 | **VENDOR MANAGEMENT**   |
@@ -1178,47 +1301,101 @@ GOOGLE_CLIENT_SECRET=your-client-secret
 | Update                  | Category             | ✅              | ❌                       | ❌              |
 | Delete                  | Category             | ✅              | ❌                       | ❌              |
 
-### 7.4 Vendor API
+### 7.4 Vendor Service Development (Port 3001)
 
-#### 7.4.1 Create Vendor Controllers
+> **Service Responsibility:** Vendor CRUD operations, vendor profile management, vendor statistics
+>
+> **Database:** vendor_db (PostgreSQL)
+>
+> **API Gateway Routes:** `/api/vendors/*` → Vendor Service
+
+#### 7.4.1 Create Vendor Module (NestJS)
+
+- [ ] Generate Vendor module: `nest g module vendor`
+- [ ] Generate Vendor controller: `nest g controller vendor`
+- [ ] Generate Vendor service: `nest g service vendor`
+- [ ] Configure Prisma client for vendor_db
+- [ ] Set up RabbitMQ client for event publishing
+
+#### 7.4.2 Create Vendor Controllers (NestJS)
 
 - [ ] Create `vendor.controller.ts`
-  - [ ] `getVendors()` - Get all vendors (admin only)
-  - [ ] `getVendor()` - Get single vendor (admin / vendor self only)
-  - [ ] `createVendor()` - Create vendor (admin only)
-  - [ ] `updateVendor()` - Update vendor (admin / vendor self only password)
-  - [ ] `deleteVendor()` - Delete vendor (admin only)
-  - [ ] `getVendorStores()` - Get vendor's stores (admin/ vendor self only)
-  - [ ] `getVendorStats()` - Get vendor statistics (admin only)
+  - [ ] `@Get()` `getVendors()` - List all vendors (admin only)
+  - [ ] `@Get(':id')` `getVendor()` - Get single vendor (admin / vendor self only)
+  - [ ] `@Post()` `createVendor()` - Create vendor (admin only)
+  - [ ] `@Put(':id')` `updateVendor()` - Update vendor (admin only - all fields)
+  - [ ] `@Put('me/password')` `updatePassword()` - Update password (vendor self only)
+  - [ ] `@Delete(':id')` `deleteVendor()` - Delete vendor (admin only)
+  - [ ] `@Get(':id/stores')` `getVendorStores()` - Get vendor's stores (admin / vendor self only)
+  - [ ] `@Get(':id/stats')` `getVendorStats()` - Get vendor statistics (admin only)
 
-#### 7.4.2 Create Vendor Services
+#### 7.4.3 Create Vendor Services (NestJS)
 
 - [ ] Create `vendor.service.ts`
-  - [ ] `findAll()` - Find all vendors with pagination
-  - [ ] `findById()` - Find vendor by ID
-  - [ ] `create()` - Create new vendor
-  - [ ] `update()` - Update vendor
-  - [ ] `delete()` - Delete vendor
-  - [ ] `findStores()` - Find vendor's stores
-  - [ ] `getStats()` - Calculate vendor statistics
+  - [ ] `findAll(pagination)` - Find all vendors with pagination
+  - [ ] `findById(id)` - Find vendor by ID
+  - [ ] `create(data)` - Create new vendor
+  - [ ] `update(id, data)` - Update vendor (all fields)
+  - [ ] `updatePassword(id, password)` - Update vendor password only
+  - [ ] `delete(id)` - Soft delete vendor
+  - [ ] `findStores(vendorId)` - Query Store Service for vendor's stores
+  - [ ] `getStats(vendorId)` - Calculate vendor statistics
 
-#### 7.4.3 Create Vendor Validators
+#### 7.4.4 Create Vendor DTOs (Data Transfer Objects)
 
-- [ ] Create `vendor.validator.ts`
-  - [ ] Validate vendor creation data
-  - [ ] Validate vendor update data
-  - [ ] Validate query parameters
+- [ ] Create `create-vendor.dto.ts`
+  - [ ] Use class-validator decorators
+  - [ ] Validate email, password, name, companyName, phone
+  
+- [ ] Create `update-vendor.dto.ts`
+  - [ ] Partial validation for updates
+  
+- [ ] Create `update-password.dto.ts`
+  - [ ] Validate currentPassword, newPassword, confirmPassword
 
-#### 7.4.4 Create Vendor Routes
+#### 7.4.5 Implement RabbitMQ Event Publishing
 
-- [ ] Create `vendor.routes.ts`
-  - [ ] GET `/vendors` - List vendors (admin only)
-  - [ ] GET `/vendors/:id` - Get vendor (admin/vendor self only)
-  - [ ] POST `/vendors` - Create vendor (admin only)
-  - [ ] PUT `/vendors/:id` - Update vendor (admin / vendor self only password)
-  - [ ] DELETE `/vendors/:id` - Delete vendor (admin only)
-  - [ ] GET `/vendors/:id/stores` - Get vendor stores (admin/ vendor self only)
-  - [ ] GET `/vendors/:id/stats` - Get vendor stats (admin only)
+- [ ] Publish `vendor.created` event after successful creation
+  - [ ] Event payload: { vendorId, email, name, companyName, createdAt }
+  - [ ] Subscribers: Auth Service (create credentials), Admin Service (update stats)
+
+- [ ] Publish `vendor.updated` event after successful update
+  - [ ] Event payload: { vendorId, changes, updatedAt }
+  - [ ] Subscribers: Auth Service (sync credentials), Admin Service (update stats)
+
+- [ ] Publish `vendor.deleted` event after successful deletion
+  - [ ] Event payload: { vendorId, deletedAt }
+  - [ ] Subscribers: Store Service (deactivate stores), Auth Service (remove credentials), Admin Service (update stats)
+
+#### 7.4.6 Implement Event Subscribers
+
+- [ ] Subscribe to `store.created` event
+  - [ ] Update vendor's store count (denormalized data)
+
+- [ ] Subscribe to `store.deleted` event
+  - [ ] Update vendor's store count
+
+#### 7.4.7 Add Authorization Guards
+
+- [ ] Create `AdminGuard` - Only admins can create/update/delete vendors
+- [ ] Create `VendorSelfGuard` - Vendors can only access their own data
+- [ ] Apply guards to controller methods
+
+#### 7.4.8 API Endpoints Summary
+
+**Vendor Service Endpoints (accessed via API Gateway `/api/vendors/*`):**
+```
+POST   /api/vendors              - Create vendor (Admin only)
+GET    /api/vendors              - List vendors (Admin only)
+GET    /api/vendors/:id          - Get vendor (Admin / Vendor self)
+PUT    /api/vendors/:id          - Update vendor (Admin only - all fields)
+PUT    /api/vendors/me/password  - Update password (Vendor self only)
+DELETE /api/vendors/:id          - Delete vendor (Admin only)
+GET    /api/vendors/:id/stores   - Get vendor stores (Admin / Vendor self)
+GET    /api/vendors/:id/stats    - Get vendor stats (Admin only)
+```
+
+**Note:** Admin Service does NOT handle vendor CRUD. It only aggregates vendor statistics via event subscriptions.
 
 ---
 
@@ -1350,13 +1527,18 @@ GOOGLE_CLIENT_SECRET=your-client-secret
 
 ---
 
-### 7.8 Email Notification Service
+### 7.8 Email Notification (Part of Auth Service)
 
-#### 7.8.1 Setup Email Service
+> **Important:** Email functionality is part of **Auth Service (Port 3005)**, NOT a separate microservice.
+>
+> **Rationale:** Auth Service handles user registration, password resets, and authentication events - all of which require email notifications. Keeping email logic in Auth Service reduces complexity and latency.
 
-- [ ] Install email library: `nodemailer` or `@sendgrid/mail`
+#### 7.8.1 Setup Email Module in Auth Service
+
+- [ ] Install email library in Auth Service: `@nestjs-modules/mailer` or `@sendgrid/mail`
 - [ ] Configure email service provider (SendGrid, AWS SES, or SMTP)
-- [ ] Create email templates directory
+- [ ] Create `email/` directory in Auth Service
+- [ ] Create email templates directory: `auth-service/src/email/templates/`
 - [ ] Set up environment variables for email configuration
 
 #### 7.8.2 Create Email Templates
@@ -1435,41 +1617,71 @@ SENDGRID_API_KEY=your-api-key
 
 ---
 
-### 7.8 Category API
+### 7.9 Category Management (Part of Product Service)
 
-#### 7.8.1 Create Category Controllers
+> **Important:** Categories are managed by **Product Service (Port 3004)**, NOT a separate service.
+>
+> **Database:** product_db (same database as products)
+>
+> **API Gateway Routes:** `/api/categories/*` → Product Service
 
-- [ ] Create `category.controller.ts`
-  - [ ] `getCategories()` - Get all categories
-  - [ ] `getCategory()` - Get single category
-  - [ ] `createCategory()` - Create category (admin only)
-  - [ ] `updateCategory()` - Update category (admin only)
-  - [ ] `deleteCategory()` - Delete category (admin only)
+#### 7.9.1 Create Category Module in Product Service
 
-#### 7.8.2 Create Category Services
+- [ ] Add Category module to Product Service
+- [ ] Generate Category controller: `nest g controller category`
+- [ ] Generate Category service: `nest g service category`
+- [ ] Use same Prisma client as products (product_db)
 
-- [ ] Create `category.service.ts`
-  - [ ] `findAll()` - Find all categories
-  - [ ] `findById()` - Find category by ID
-  - [ ] `create()` - Create new category
-  - [ ] `update()` - Update category
-  - [ ] `delete()` - Delete category
+#### 7.9.2 Create Category Controllers (NestJS)
 
-#### 7.8.3 Create Category Validators
+- [ ] Create `category.controller.ts` in Product Service
+  - [ ] `@Get()` `getCategories()` - Get all categories (public)
+  - [ ] `@Get(':id')` `getCategory()` - Get single category (public)
+  - [ ] `@Post()` `createCategory()` - Create category (admin only)
+  - [ ] `@Put(':id')` `updateCategory()` - Update category (admin only)
+  - [ ] `@Delete(':id')` `deleteCategory()` - Delete category (admin only)
+  - [ ] `@Get(':id/products')` `getCategoryProducts()` - Get products in category (public)
 
-- [ ] Create `category.validator.ts`
-  - [ ] Validate category creation data
-  - [ ] Validate category update data
-  - [ ] Validate slug format
+#### 7.9.3 Create Category Services (NestJS)
 
-#### 7.8.4 Create Category Routes
+- [ ] Create `category.service.ts` in Product Service
+  - [ ] `findAll()` - Find all categories (with hierarchy)
+  - [ ] `findById(id)` - Find category by ID
+  - [ ] `findBySlug(slug)` - Find category by slug
+  - [ ] `create(data)` - Create new category
+  - [ ] `update(id, data)` - Update category
+  - [ ] `delete(id)` - Delete category (check for products first)
+  - [ ] `getProductCount(categoryId)` - Count products in category
 
-- [ ] Create `category.routes.ts`
-  - [ ] GET `/categories` - List categories (public)
-  - [ ] GET `/categories/:id` - Get category (public)
-  - [ ] POST `/categories` - Create category (admin only)
-  - [ ] PUT `/categories/:id` - Update category (admin only)
-  - [ ] DELETE `/categories/:id` - Delete category (admin only)
+#### 7.9.4 Create Category DTOs
+
+- [ ] Create `create-category.dto.ts`
+  - [ ] Validate name, slug, description, parentId
+  
+- [ ] Create `update-category.dto.ts`
+  - [ ] Partial validation for updates
+
+#### 7.9.5 Category-Product Relationship
+
+- [ ] Products table already has `categoryId` foreign key
+- [ ] When deleting category, handle products:
+  - [ ] Option 1: Prevent deletion if products exist
+  - [ ] Option 2: Set products' categoryId to null
+  - [ ] Option 3: Move products to parent category
+
+#### 7.9.6 API Endpoints Summary
+
+**Category Endpoints (accessed via API Gateway `/api/categories/*`):**
+```
+GET    /api/categories              - List all categories (Public)
+GET    /api/categories/:id          - Get category (Public)
+GET    /api/categories/:id/products - Get category products (Public)
+POST   /api/categories              - Create category (Admin only)
+PUT    /api/categories/:id          - Update category (Admin only)
+DELETE /api/categories/:id          - Delete category (Admin only)
+```
+
+**Note:** Categories are stored in product_db and managed by Product Service because they are tightly coupled with products.
 
 ---
 
@@ -1599,14 +1811,58 @@ SENDGRID_API_KEY=your-api-key
   - [ ] Test UserList
   - [ ] Test UserProfile
 
-#### 8.1.4 Test Backend Services
+#### 8.1.4 Test Backend Microservices (NestJS)
 
-- [ ] Test auth service
-- [ ] Test vendor service
-- [ ] Test store service
-- [ ] Test product service
-- [ ] Test user service
-- [ ] Test search service
+> **Important:** Testing microservices requires NestJS testing utilities and RabbitMQ event testing.
+
+- [ ] Test Auth Service (Port 3005)
+  - [ ] Use NestJS testing module: `@nestjs/testing`
+  - [ ] Test authentication logic
+  - [ ] Test JWT token generation/validation
+  - [ ] Test password hashing
+  - [ ] Test email sending (mock email service)
+  - [ ] Test RabbitMQ event publishing
+
+- [ ] Test Vendor Service (Port 3001)
+  - [ ] Test vendor CRUD operations
+  - [ ] Test Prisma database interactions
+  - [ ] Test RabbitMQ event publishing (vendor.created, vendor.updated, vendor.deleted)
+  - [ ] Test authorization guards
+
+- [ ] Test User Service (Port 3002)
+  - [ ] Test user CRUD operations
+  - [ ] Test Prisma database interactions
+  - [ ] Test RabbitMQ event publishing (user.created, user.updated, user.deleted)
+
+- [ ] Test Store Service (Port 3003)
+  - [ ] Test store CRUD operations
+  - [ ] Test RabbitMQ event subscriptions (vendor.deleted)
+  - [ ] Test RabbitMQ event publishing (store.created, store.updated, store.deleted)
+
+- [ ] Test Product Service (Port 3004)
+  - [ ] Test product CRUD operations
+  - [ ] Test category CRUD operations
+  - [ ] Test RabbitMQ event subscriptions (store.deleted)
+  - [ ] Test RabbitMQ event publishing (product.created, product.updated, product.deleted)
+  - [ ] Test search functionality
+
+- [ ] Test Admin Service (Port 3006)
+  - [ ] Test statistics aggregation
+  - [ ] Test audit log creation
+  - [ ] Test RabbitMQ event subscriptions (all service events)
+  - [ ] Test dashboard metrics calculation
+
+- [ ] Test API Gateway (Port 3000)
+  - [ ] Test routing to microservices
+  - [ ] Test JWT authentication middleware
+  - [ ] Test rate limiting
+  - [ ] Test request/response transformation
+
+- [ ] Test RabbitMQ Event Flow
+  - [ ] Test event publishing
+  - [ ] Test event subscription
+  - [ ] Test event retry mechanisms
+  - [ ] Test dead letter queue handling
 
 ---
 
