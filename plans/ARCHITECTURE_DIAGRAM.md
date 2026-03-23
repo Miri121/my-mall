@@ -1,6 +1,6 @@
 # E-Commerce Platform - Architecture Diagrams
 
-## System Architecture Overview
+## System Architecture Overview - Microservices
 
 ```mermaid
 graph TB
@@ -33,9 +33,20 @@ graph TB
         AdminDomain[domain/admin<br/>Admin Logic]
     end
 
-    subgraph "Backend"
-        API[API Server<br/>Port 3000<br/>Express.js]
-        DB[(PostgreSQL or MongoDB<br/>Database)]
+    subgraph "Backend Microservices"
+        Gateway[API Gateway<br/>Port 3000<br/>NestJS]
+        AdminService[Admin Service<br/>Port 3001<br/>NestJS]
+        StoreService[Store Service<br/>Port 3002<br/>NestJS]
+        ProductService[Product Service<br/>Port 3003<br/>NestJS]
+        AuthService[Auth Service<br/>Port 3004<br/>NestJS]
+        RabbitMQ[RabbitMQ<br/>Port 5672<br/>Message Broker]
+    end
+
+    subgraph "Data Layer"
+        AdminDB[(Admin DB<br/>PostgreSQL)]
+        StoreDB[(Store DB<br/>PostgreSQL)]
+        ProductDB[(Product DB<br/>PostgreSQL)]
+        AuthDB[(Auth DB<br/>PostgreSQL)]
         Storage[File Storage<br/>S3/Cloudinary]
     end
 
@@ -73,9 +84,66 @@ graph TB
     Vendor --> I18n
     Admin --> I18n
 
-    DataAccess --> API
-    API --> DB
-    API --> Storage
+    DataAccess --> Gateway
+    Gateway --> AdminService
+    Gateway --> StoreService
+    Gateway --> ProductService
+    Gateway --> AuthService
+
+    AdminService --> RabbitMQ
+    StoreService --> RabbitMQ
+    ProductService --> RabbitMQ
+    AuthService --> RabbitMQ
+
+    AdminService --> AdminDB
+    StoreService --> StoreDB
+    ProductService --> ProductDB
+    AuthService --> AuthDB
+
+    ProductService --> Storage
+    StoreService --> Storage
+```
+
+---
+
+## Microservices Communication Flow
+
+```mermaid
+graph LR
+    subgraph "Frontend"
+        Client[Client Apps]
+    end
+
+    subgraph "API Gateway"
+        Gateway[API Gateway<br/>Port 3000]
+    end
+
+    subgraph "Microservices"
+        Admin[Admin Service<br/>Port 3001]
+        Store[Store Service<br/>Port 3002]
+        Product[Product Service<br/>Port 3003]
+        Auth[Auth Service<br/>Port 3004]
+    end
+
+    subgraph "Message Broker"
+        RabbitMQ[RabbitMQ<br/>Port 5672]
+    end
+
+    Client -->|HTTP/REST| Gateway
+    Gateway -->|HTTP| Admin
+    Gateway -->|HTTP| Store
+    Gateway -->|HTTP| Product
+    Gateway -->|HTTP| Auth
+
+    Admin -.->|Events| RabbitMQ
+    Store -.->|Events| RabbitMQ
+    Product -.->|Events| RabbitMQ
+    Auth -.->|Events| RabbitMQ
+
+    RabbitMQ -.->|Subscribe| Admin
+    RabbitMQ -.->|Subscribe| Store
+    RabbitMQ -.->|Subscribe| Product
+    RabbitMQ -.->|Subscribe| Auth
 ```
 
 ---
@@ -439,10 +507,11 @@ erDiagram
 ```
 
 **Key Changes:**
+
 - **VENDORS:** Now independent entity with own authentication (no userId FK)
 - **PRODUCTS:** Images stored as JSON array of URLs/paths (no separate PRODUCT_IMAGES table)
 - **STORES:** Added `url` field for external store website
-- **PRODUCTS:** Added `stock` field for inventory management
+- **PRODUCTS:** Images stored as JSON array of URLs/paths
 
 ---
 

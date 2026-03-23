@@ -60,7 +60,6 @@ Once a vendor account is created by admin, vendors:
 - Log into the Vendor app
 - See the store(s) assigned to them
 - **Create, update, or delete products** with names, descriptions, prices, images
-- Manage inventory (stock levels)
 - Organize products by categories
 
 ### 3. Customers Manage Account,
@@ -108,7 +107,7 @@ Everything lives in one codebase organized into folders:
 - **Stores** - Everything related to managing stores (CRUD operations)
   - Fields: id, name, slug, **url** (REQUIRED - external website URL for iframe), description, logo, coverImage, vendorId, isActive, createdAt, updatedAt
 - **Products** - Everything related to managing products (CRUD operations)
-  - Fields: id, name, description, **images** (JSON array of URLs/paths), price, comparePrice, **stock** (inventory quantity), storeId, categoryId, isActive, createdAt, updatedAt
+  - Fields: id, name, description, **images** (JSON array of URLs/paths), price, comparePrice, storeId, categoryId, isActive, createdAt, updatedAt
   - **Note:** Images are stored in server filesystem or cloud storage (S3/Cloudinary), database only stores the paths as JSON array
 - **Users** - Customer account management (CRUD operations)
   - Fields: id, email, password, name, phone, role, avatar, isActive, createdAt, updatedAt
@@ -124,6 +123,20 @@ Everything lives in one codebase organized into folders:
 ---
 
 ## The Technology Stack Explained
+
+### Backend Architecture: NestJS Microservices
+
+The backend is built using a microservices architecture with NestJS:
+
+- **API Gateway** - Single entry point for all client requests
+- **Admin Service** - Handles vendor, store, and user management
+- **Store Service** - Manages store operations and catalog
+- **Product Service** - Handles product CRUD operations
+- **Auth Service** - Authentication and authorization
+- **RabbitMQ** - Message broker for inter-service communication
+- **Event-driven architecture** - Services communicate via events
+- **Independent deployment** - Each service can be deployed separately
+- **Scalability** - Scale services independently based on load
 
 ### Authentication: react-auth-kit
 
@@ -597,7 +610,7 @@ Defines what valid data looks like:
 
 1. **Vendor App** → Vendor clicks Edit on product
 2. **ProductForm** → Loads with existing product data
-3. **Vendor modifies** → Price, description, or stock
+3. **Vendor modifies** → Price, description, or images
 4. **Form validates** → Zod ensures all fields still valid
 5. **Vendor clicks Save** → - shadcn/ui AlertDialog for confirmation
    and Triggers update mutation
@@ -1059,6 +1072,84 @@ Document all components with interactive examples
 
 ---
 
+## Microservices Architecture
+
+### Service Breakdown
+
+**API Gateway (Port 3000):**
+
+- Routes requests to appropriate microservices
+- Handles authentication middleware
+- Rate limiting and request validation
+- Aggregates responses from multiple services
+
+**Admin Service (Port 3001):**
+
+- Vendor CRUD operations
+- Store CRUD operations
+- User management
+- Platform statistics
+- Emits events: `vendor.created`, `vendor.updated`, `store.created`, etc.
+
+**Store Service (Port 3002):**
+
+- Store catalog management
+- Store-product relationships
+- Store analytics
+- Listens to: `vendor.deleted` (cascade store deletion)
+- Emits events: `store.updated`, `store.deleted`
+
+**Product Service (Port 3003):**
+
+- Product CRUD operations
+- Inventory management
+- Product search and filtering
+- Image upload handling
+- Listens to: `store.deleted` (cascade product deletion)
+- Emits events: `product.created`, `product.updated`, `product.deleted`
+
+**Auth Service (Port 3004):**
+
+- User authentication (login, register, logout)
+- JWT token generation and validation
+- Password reset functionality
+- OAuth integration (Google)
+- Session management
+
+**RabbitMQ (Port 5672):**
+
+- Message broker for inter-service communication
+- Event-driven architecture
+- Ensures eventual consistency
+- Handles async operations
+- Retry mechanisms for failed messages
+
+### Inter-Service Communication
+
+**Synchronous (HTTP/REST):**
+
+- Client → API Gateway → Microservice
+- Used for immediate responses
+- Request-response pattern
+
+**Asynchronous (RabbitMQ):**
+
+- Service → RabbitMQ → Service
+- Used for events and background tasks
+- Publish-subscribe pattern
+- Ensures loose coupling
+
+**Example Flow - Admin Creates Vendor:**
+
+1. Admin App → API Gateway → Admin Service (HTTP)
+2. Admin Service creates vendor in database
+3. Admin Service publishes `vendor.created` event to RabbitMQ
+4. Email Service listens and sends welcome email
+5. Analytics Service listens and updates statistics
+6. Admin Service returns response to client
+
+---
+
 ### Data Storage & Security
 
 #### Password Security
@@ -1414,7 +1505,6 @@ Display categories in Mall app filters
 
 - New user roles (e.g., "Moderator" role)
 - New features (e.g., product reviews, ratings)
-- New applications (e.g., "Warehouse" app for inventory)
 - New integrations (e.g., payment gateways, shipping providers)
 - New CRUD entities (e.g., categories, tags, discounts)
 

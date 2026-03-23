@@ -97,6 +97,24 @@ Covers:
 
 ---
 
+### 📋 [MICROSERVICES_ARCHITECTURE.md](./MICROSERVICES_ARCHITECTURE.md)
+
+**Complete Backend Architecture**
+
+Covers:
+
+- **Service Breakdown:** API Gateway, Admin, Store, Product, Auth services
+- **RabbitMQ:** Message broker configuration and event patterns
+- **Inter-Service Communication:** Synchronous (HTTP) and Asynchronous (Events)
+- **Data Flow Examples:** Complete request/response flows
+- **Database Strategy:** Database per service pattern
+- **Deployment:** Docker Compose and Kubernetes configurations
+- **Monitoring:** Prometheus, Grafana, ELK Stack, Jaeger tracing
+- **Security:** API Gateway, service-to-service, database, RabbitMQ
+- **Scalability:** Horizontal and vertical scaling strategies
+
+---
+
 ## Quick Reference
 
 ### Total Phases: 10
@@ -138,11 +156,15 @@ Covers:
 
 ### Backend
 
-- Node.js + Express.js
-- PostgreSQL or MongoDB
-- Prisma
-- JWT + bcrypt
-- Multer (file uploads)
+- **NestJS** - Progressive Node.js framework
+- **Microservices Architecture** - Admin, Store, Product,Vendor,user, Auth services
+- **RabbitMQ** - Message broker for inter-service communication
+- **API Gateway** - Single entry point for all requests
+- **PostgreSQL** or **MongoDB** - Database
+- **Prisma**- ORM
+- **JWT + bcrypt** - Authentication
+- **Multer** - File uploads
+- **Event-driven** - Async communication between services
 
 ### DevOps & Testing
 
@@ -222,7 +244,14 @@ apps/
   ├── mall/              # Customer-facing app (Port 4200)
   ├── vendor/            # Vendor management app (Port 4201)
   ├── admin/             # Admin control panel (Port 4202)
-  └── api/               # Backend API (Port 3000)
+  └── backend/
+      ├── api-gateway/   # API Gateway (Port 3000)
+      ├── admin-service/ # Admin microservice (Port 3001)
+      ├── vendor-service/ # Vendor microservice (Port 3002)
+      ├── user-service/ # User microservice (Port 3003)
+      ├── store-service/ # Store microservice (Port 3004)
+      ├── product-service/ # Product microservice (Port 3005)
+      └── auth-service/  # Auth microservice (Port 3006)
 
 libs/
   ├── shared/

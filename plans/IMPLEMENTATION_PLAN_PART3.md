@@ -385,7 +385,6 @@
   - [ ] How to log in
   - [ ] How to add products
   - [ ] How to edit products
-  - [ ] How to manage inventory
   - [ ] How to view statistics
 
 - [ ] Create Admin app user guide

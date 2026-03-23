@@ -339,7 +339,7 @@
   - **Permission:** Vendor only (Role.VENDOR)
   - **CRUD:** Create (product in own stores)
   - **Components:** ProductForm, StoreSelect
-  - **Fields:** name, description, price, comparePrice, images, category, stock, storeId
+  - **Fields:** name, description, price, comparePrice, images, category, storeId
   - **Validation:** Zod schema
   - **Image Upload:** Drag & drop or file picker
   - **Success:** Redirect to `/products` + toast
@@ -708,48 +708,142 @@
 
 ---
 
-## Phase 7: Backend API Development
+## Phase 7: Backend Microservices Development (NestJS + RabbitMQ)
 
-### 7.1 API Setup & Configuration
+> **Architecture Change:** The backend uses NestJS microservices architecture with RabbitMQ for inter-service communication instead of a monolithic Express.js API.
+>
+> **Reference:** See [`plans/MICROSERVICES_ARCHITECTURE.md`](./MICROSERVICES_ARCHITECTURE.md) for complete architecture details.
 
-#### 7.1.1 Install Backend Dependencies
+### 7.1 Setup Microservices Infrastructure
 
-- [ ] Install Express.js (already installed)
-- [ ] Install database ORM (Prisma)
-- [ ] Install bcrypt for password hashing
-- [ ] Install jsonwebtoken for JWT tokens
-- [ ] Install express-validator for validation
-- [ ] Install multer for file uploads
-- [ ] Install cors for CORS handling
-- [ ] Install helmet for security headers
-- [ ] Install compression for response compression
-- [ ] Install morgan for logging
-- [ ] Install dotenv for environment variables
+#### 7.1.1 Install NestJS CLI and Core Dependencies
 
-#### 7.1.2 Configure Database
+- [ ] Install NestJS CLI globally: `npm install -g @nestjs/cli`
+- [ ] Install NestJS core packages:
+  - [ ] `@nestjs/common`
+  - [ ] `@nestjs/core`
+  - [ ] `@nestjs/platform-express`
+  - [ ] `@nestjs/microservices`
+  - [ ] `@nestjs/config`
+  - [ ] `@nestjs/jwt`
+  - [ ] `@nestjs/passport`
+  - [ ] `passport`
+  - [ ] `passport-jwt`
+  - [ ] `passport-google-oauth20`
 
-- [ ] Choose database (PostgreSQL recommended or MongoDB)
-- [ ] Set up database connection
-- [ ] Create database schema
-- [ ] Set up migrations
-- [ ] Create seed data for development
+#### 7.1.2 Install Database and ORM
 
-#### 7.1.3 Setup API Structure
+- [ ] Install Prisma or TypeORM:
+  - [ ] `@prisma/client`
+  - [ ] `prisma`
+  - [ ] `pg` (PostgreSQL driver)
+- [ ] Install bcrypt for password hashing: `bcrypt`
+- [ ] Install class-validator and class-transformer for validation
 
-- [ ] Create `src/config/` directory for configuration
-- [ ] Create `src/middleware/` directory for middleware
-- [ ] Create `src/routes/` directory for routes
-- [ ] Create `src/controllers/` directory for controllers
-- [ ] Create `src/services/` directory for business logic
-- [ ] Create `src/models/` directory for data models
-- [ ] Create `src/utils/` directory for utilities
-- [ ] Create `src/validators/` directory for validation schemas
+#### 7.1.3 Install RabbitMQ Client
+
+- [ ] Install RabbitMQ packages:
+  - [ ] `amqplib`
+  - [ ] `amqp-connection-manager`
+- [ ] Install NestJS microservices transport: Already included in `@nestjs/microservices`
+
+#### 7.1.4 Install Additional Dependencies
+
+- [ ] Install file upload: `multer`, `@nestjs/platform-express`
+- [ ] Install AWS SDK for S3: `@aws-sdk/client-s3` (optional)
+- [ ] Install compression: `compression`
+- [ ] Install helmet for security: `helmet`
+- [ ] Install CORS: Already included in NestJS
+- [ ] Install logging: `winston`, `nest-winston`
+- [ ] Install Swagger for API docs: `@nestjs/swagger`, `swagger-ui-express`
+
+#### 7.1.5 Setup Microservices Project Structure
+
+- [ ] Create `apps/backend/` directory in Nx workspace
+- [ ] Generate API Gateway: `nx g @nx/nest:app api-gateway --directory=backend`
+- [ ] Generate Admin Service: `nx g @nx/nest:app admin-service --directory=backend`
+- [ ] Generate Vendor Service: `nx g @nx/nest:app vendor-service --directory=backend`
+- [ ] Generate User Service: `nx g @nx/nest:app user-service --directory=backend`
+- [ ] Generate Store Service: `nx g @nx/nest:app store-service --directory=backend`
+- [ ] Generate Product Service: `nx g @nx/nest:app product-service --directory=backend`
+- [ ] Generate Auth Service: `nx g @nx/nest:app auth-service --directory=backend`
+
+#### 7.1.6 Configure RabbitMQ
+
+- [ ] Install RabbitMQ locally or use Docker:
+  ```bash
+  docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+  ```
+- [ ] Access RabbitMQ Management UI: http://localhost:15672 (guest/guest)
+- [ ] Create exchanges and queues for each service
+- [ ] Configure dead letter queues for error handling
+
+#### 7.1.7 Setup Docker Compose for Development
+
+- [ ] Create `docker-compose.yml` in workspace root
+- [ ] Add RabbitMQ service
+- [ ] Add PostgreSQL services (one per microservice)
+- [ ] Add Redis for caching (optional)
+- [ ] Configure service networking
+- [ ] Add volume mounts for data persistence
 
 ---
 
-### 7.2 Database Schema
+---
 
-#### 7.2.1 Create User Tables
+### 7.2 API Gateway Development (Port 3000)
+
+#### 7.2.1 Setup API Gateway
+
+- [ ] Configure Express adapter in API Gateway
+- [ ] Install and configure Swagger for API documentation
+- [ ] Set up CORS, helmet, compression middleware
+- [ ] Configure rate limiting
+- [ ] Set up request logging with Winston
+
+#### 7.2.2 Implement JWT Authentication Middleware
+
+- [ ] Create JWT strategy with Passport
+- [ ] Implement JWT validation middleware
+- [ ] Create role-based guards (Admin, Vendor, Customer)
+- [ ] Handle token refresh logic
+- [ ] Implement logout (token blacklisting)
+
+#### 7.2.3 Setup Microservice Clients
+
+- [ ] Configure RabbitMQ transport for each microservice
+- [ ] Create service clients:
+  - [ ] Admin Service client
+  - [ ] Vendor Service client
+  - [ ] User Service client
+  - [ ] Store Service client
+  - [ ] Product Service client
+  - [ ] Auth Service client
+- [ ] Implement retry logic and circuit breakers
+- [ ] Add request timeout handling
+
+#### 7.2.4 Create API Gateway Routes
+
+- [ ] Auth routes (`/api/auth/*`) → Auth Service
+- [ ] Vendor routes (`/api/vendors/*`) → Admin Service
+- [ ] Store routes (`/api/stores/*`) → Admin/Store Service
+- [ ] Product routes (`/api/products/*`) → Product Service
+- [ ] Users routes (`/api/users/*`) → Admin Service
+- [ ] User routes (`/api/user/*`) → User Service
+- [ ] Search routes (`/api/search/*`) → Product Service
+
+#### 7.2.5 Implement Response Aggregation
+
+- [ ] Create response transformation interceptors
+- [ ] Handle errors from microservices
+- [ ] Implement response caching (Redis)
+- [ ] Add response compression
+
+---
+
+### 7.3 Database Schema (All Services)
+
+#### 7.3.1 Create User Tables (Admin Service DB)
 
 - [ ] Create `users` table
   - [ ] id (UUID, primary key)
@@ -793,6 +887,7 @@
   - [ ] updatedAt (timestamp)
 
 **Store URL Field Clarification:**
+
 - [ ] Products are stored in YOUR database and managed by vendors through the Vendor app
 - [ ] The `url` field is REQUIRED and used to embed an external website via iframe on the store page
 - [ ] The store page displays the external iframe showing the vendor's website
@@ -852,12 +947,14 @@
 #### 7.2.8 Audit Log Implementation
 
 **Purpose:**
+
 - Track all CRUD operations for compliance and security
 - Monitor user activities
 - Provide audit trail for troubleshooting
 - Meet regulatory requirements (GDPR, etc.)
 
 **What to Log:**
+
 - [ ] Vendor CRUD operations (admin only)
 - [ ] Store CRUD operations (admin only)
 - [ ] Product CRUD operations (vendor and admin)
@@ -869,6 +966,7 @@
 - [ ] Account deletions
 
 **Audit Log Middleware:**
+
 - [ ] Create `audit.middleware.ts`
   - [ ] Capture request details (user, IP, user agent)
   - [ ] Capture action type (CREATE, UPDATE, DELETE)
@@ -878,6 +976,7 @@
   - [ ] Handle logging errors gracefully (don't block requests)
 
 **Audit Log Service:**
+
 - [ ] Create `audit.service.ts`
   - [ ] `logAction(userId, action, entity, entityId, changes, ipAddress, userAgent)`
   - [ ] `getAuditLogs(filters)` - Query audit logs with pagination
@@ -886,6 +985,7 @@
   - [ ] `exportAuditLogs(startDate, endDate)` - Export for compliance
 
 **When to Log:**
+
 - **CREATE:** After successful creation
 - **UPDATE:** After successful update (include before/after values)
 - **DELETE:** Before deletion (capture final state)
@@ -894,12 +994,14 @@
 - **FAILED_LOGIN:** After failed login attempt
 
 **Audit Log Retention:**
+
 - [ ] Keep audit logs for 7 years (regulatory compliance)
 - [ ] Implement log rotation/archiving
 - [ ] Compress old logs
 - [ ] Separate storage for archived logs
 
 **Security Considerations:**
+
 - [ ] Audit logs are append-only (no updates or deletes)
 - [ ] Only admins can view audit logs
 - [ ] Sensitive data (passwords) never logged
@@ -907,6 +1009,7 @@
 - [ ] Regular backup of audit logs
 
 **Admin Audit Log Viewer:**
+
 - [ ] Create admin endpoint: GET `/admin/audit-logs`
 - [ ] Filter by: user, action, entity, date range
 - [ ] Pagination support
@@ -1186,7 +1289,6 @@ GOOGLE_CLIENT_SECRET=your-client-secret
   - [ ] `delete()` - Delete product
   - [ ] `uploadImages()` - Handle image uploads
   - [ ] `deleteImage()` - Delete image
-  - [ ] `updateStock()` - Update stock quantity
 
 #### 7.6.3 Create Product Validators
 
@@ -1194,7 +1296,6 @@ GOOGLE_CLIENT_SECRET=your-client-secret
   - [ ] Validate product creation data
   - [ ] Validate product update data
   - [ ] Validate price values
-  - [ ] Validate stock values
   - [ ] Validate query parameters
 
 #### 7.6.4 Create Product Routes
