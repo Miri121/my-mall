@@ -54,16 +54,17 @@ The backend uses **7 independent NestJS microservices** with **RabbitMQ** messag
 ```
 POST   /vendors              - Create vendor (Admin only)
 GET    /vendors              - List vendors (Admin only)
-GET    /vendors/:id          - Get vendor details (Admin only)
-PUT    /vendors/:id          - Update vendor (Admin only)
+GET    /vendors/:id          - Get vendor details (Admin / Vendor self)
+PUT    /vendors/:id          - Update vendor (Admin only - all fields)
+PUT    /vendors/me/password  - Update password (Vendor self only)
 DELETE /vendors/:id          - Delete vendor (Admin only)
-GET    /vendors/:id/stores   - Get vendor's stores (Admin only)
+GET    /vendors/:id/stores   - Get vendor's stores (Admin / Vendor self)
 GET    /vendors/:id/stats    - Get vendor statistics (Admin only)
 ```
 
 **Who Can Access:**
-- Admin: Full CRUD
-- Vendor: Read own profile only (via Auth Service)
+- Admin: Full CRUD on all fields
+- Vendor: Read own profile + Update own password ONLY (cannot update email, name, company, phone)
 
 ---
 
@@ -129,7 +130,7 @@ POST   /users/me/avatar      - Upload avatar (Self)
 
 **API Endpoints:**
 ```
-POST   /stores               - Create store (Admin only)
+POST   /stores               - Create store (Admin only) - URL field REQUIRED
 GET    /stores               - List stores (Public)
 GET    /stores/:id           - Get store details (Public)
 GET    /stores/slug/:slug    - Get store by slug (Public)
@@ -140,6 +141,8 @@ POST   /stores/:id/cover     - Upload store cover (Admin only)
 GET    /stores/:id/products  - Get store products (Public)
 GET    /stores/:id/stats     - Get store statistics (Admin only)
 ```
+
+**Note:** The `url` field is REQUIRED when creating a store. It stores the external website URL that will be displayed via iframe.
 
 **Who Can Access:**
 - Admin: Full CRUD
@@ -249,12 +252,14 @@ GET    /auth/me              - Get current authenticated user
 **Technology:** NestJS Microservice
 
 **Responsibilities:**
-- Platform statistics and analytics
+- Platform statistics and analytics (aggregated from events)
 - Dashboard metrics aggregation
 - System health monitoring
 - Audit log management
 - Platform-wide reports
-- Admin-specific business logic
+- **DOES NOT handle CRUD operations** - only statistics and monitoring
+
+**Important:** Admin Service does NOT perform CRUD operations on vendors, users, stores, or products. Those operations are handled by their respective services (Vendor Service, User Service, Store Service, Product Service). Admin Service ONLY aggregates statistics and manages audit logs.
 
 **Database:** PostgreSQL (admin_db)
 

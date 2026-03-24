@@ -712,6 +712,15 @@
 
 > **Architecture:** The backend uses **7 NestJS microservices** with **RabbitMQ** for inter-service communication.
 >
+> **Service Breakdown:**
+> - API Gateway (Port 3000) - Single entry point, JWT validation, routing
+> - Vendor Service (Port 3001) - Vendor CRUD operations
+> - User Service (Port 3002) - User (Customer) CRUD operations
+> - Store Service (Port 3003) - Store CRUD operations
+> - Product Service (Port 3004) - Product CRUD + Category management
+> - Auth Service (Port 3005) - Authentication, JWT tokens, password resets
+> - Admin Service (Port 3006) - Platform statistics, audit logs, dashboard metrics
+>
 > **Reference:** See [`plans/MICROSERVICES_ARCHITECTURE.md`](./MICROSERVICES_ARCHITECTURE.md) for complete architecture details.
 
 ---
@@ -918,7 +927,7 @@
   - [ ] id (UUID, primary key)
   - [ ] name (not null)
   - [ ] slug (unique, not null)
-  - [ ] url (text, nullable) - External website URL for iframe embedding
+  - [ ] url (text, **REQUIRED, not null**) - External website URL for iframe embedding
   - [ ] description (text, nullable)
   - [ ] logo (nullable)
   - [ ] coverImage (nullable)
@@ -930,9 +939,10 @@
 
 **Store URL Field Clarification:**
 - [ ] Products are stored in Product Service database and managed by vendors
-- [ ] The `url` field is OPTIONAL and used to embed vendor's external website via iframe
-- [ ] The store page can display both: platform products AND external iframe
-- [ ] This allows vendors to showcase their existing website alongside platform products
+- [ ] The `url` field is **REQUIRED** and used to embed vendor's external website via iframe
+- [ ] The store page displays the vendor's external website through iframe
+- [ ] This allows vendors to showcase their existing website through the platform
+- [ ] Products are managed separately in the Product Service database
 
 - [ ] Run Prisma migrations: `npx prisma migrate dev --name init`
 - [ ] Generate Prisma client: `npx prisma generate`
@@ -1007,6 +1017,12 @@
 #### 7.3.6 Admin Service Database (admin_db)
 
 **Location:** Admin Service (Port 3006)
+
+**Important:** Admin Service does NOT handle CRUD operations for vendors, users, or stores. It ONLY handles:
+- Platform statistics aggregation (by subscribing to events from other services)
+- Audit log management
+- Dashboard metrics calculation
+- System health monitoring
 
 - [ ] Create Prisma schema for admin_db
 - [ ] Create `audit_logs` table
@@ -1269,9 +1285,11 @@ GOOGLE_CLIENT_SECRET=your-client-secret
 
 **Vendor Update Clarification:**
 
-Vendors have TWO separate update endpoints:
-- `PUT /api/vendors/:id` - Admin only (can update all fields: email, name, company, phone)
-- `PUT /api/vendors/me/password` - Vendor self only (can only update own password)
+Vendors have **LIMITED UPDATE PERMISSIONS**:
+- `PUT /api/vendors/:id` - **Admin only** (can update all fields: email, name, company, phone)
+- `PUT /api/vendors/me/password` - **Vendor self only** (can ONLY update own password)
+- **Important:** Vendors CANNOT update their profile fields (email, name, company, phone) - only admin can do this
+- Vendors can ONLY change their own password via the dedicated password endpoint
 
 | Operation               | Entity               | Admin           | Vendor                   | Customer        |
 | ----------------------- | -------------------- | --------------- | ------------------------ | --------------- |

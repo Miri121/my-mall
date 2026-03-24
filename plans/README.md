@@ -231,9 +231,10 @@ Covers:
 **External Store Feature:**
 
 - **Products:** Stored in YOUR database, managed by vendors through Vendor app
-- **Store URL:** Required field in stores table to embed external website via iframe
+- **Store URL:** **REQUIRED** field in stores table to embed external website via iframe
 - **Store Page:** Displays the external iframe showing the vendor's website
 - **Use Case:** Vendor showcases their existing website through the platform
+- **Note:** The URL field is mandatory - every store must have an external website URL
 
 ---
 
@@ -245,13 +246,13 @@ apps/
   ├── vendor/            # Vendor management app (Port 4201)
   ├── admin/             # Admin control panel (Port 4202)
   └── backend/
-      ├── api-gateway/   # API Gateway (Port 3000)
-      ├── admin-service/ # Admin microservice (Port 3001)
-      ├── vendor-service/ # Vendor microservice (Port 3002)
-      ├── user-service/ # User microservice (Port 3003)
-      ├── store-service/ # Store microservice (Port 3004)
-      ├── product-service/ # Product microservice (Port 3005)
-      └── auth-service/  # Auth microservice (Port 3006)
+      ├── api-gateway/    # API Gateway (Port 3000) - Routing, JWT validation
+      ├── vendor-service/ # Vendor microservice (Port 3001) - Vendor CRUD
+      ├── user-service/   # User microservice (Port 3002) - User CRUD
+      ├── store-service/  # Store microservice (Port 3003) - Store CRUD
+      ├── product-service/ # Product microservice (Port 3004) - Product CRUD + Categories
+      ├── auth-service/   # Auth microservice (Port 3005) - Authentication + Email
+      └── admin-service/  # Admin microservice (Port 3006) - Statistics + Audit logs
 
 libs/
   ├── shared/
@@ -293,8 +294,9 @@ libs/
 
 - ✅ Manage own products (CRUD)
 - ✅ View assigned stores (read-only)
-- ✅ Update own profile and password
+- ✅ Update own password ONLY (via PUT /vendors/me/password)
 - ✅ View product statistics
+- ❌ Cannot update profile fields (email, name, company, phone) - admin only
 - ❌ Cannot create stores
 - ❌ Cannot see other vendors' data
 

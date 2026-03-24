@@ -106,7 +106,7 @@ Everything lives in one codebase organized into folders:
   - Fields: id, email, password, name, companyName, phone, isActive, createdAt, updatedAt
 - **Stores** - Everything related to managing stores (CRUD operations)
   - Fields: id, name, slug, **url** (REQUIRED - external website URL for iframe embedding vendor's existing website), description, logo, coverImage, vendorId, isActive, createdAt, updatedAt
-  - **Store URL Purpose:** The `url` field stores the external website address that will be displayed via iframe on the store page. This allows vendors to showcase their existing website through the platform while products are managed separately in the database.
+  - **Store URL Purpose:** The `url` field is REQUIRED and stores the external website address that will be displayed via iframe on the store page. This allows vendors to showcase their existing website through the platform while products are managed separately in the database.
 - **Products** - Everything related to managing products (CRUD operations)
   - Fields: id, name, description, **images** (JSON array of URLs/paths), price, comparePrice, storeId, categoryId, isActive, createdAt, updatedAt
   - **Note:** Images are stored in server filesystem or cloud storage (S3/Cloudinary), database only stores the paths as JSON array
@@ -711,7 +711,8 @@ Defines what valid data looks like:
 | --------- | --------------- | --------------- | ------------------------ | --------- |
 | Create    | Vendor          | ✅              | ❌                       | ❌        |
 | Read      | Vendor          | ✅              | ✅ (self only)           | ❌        |
-| Update    | Vendor          | ✅ (all fields) | ✅ (password only, self) | ❌        |
+| Update    | Vendor          | ✅ (all fields) | ❌ (ONLY password via separate endpoint) | ❌        |
+| Update    | Vendor Password | ✅              | ✅ (self only via PUT /vendors/me/password) | ❌        |
 | Delete    | Vendor          | ✅              | ❌                       | ❌        |
 | Create    | Store           | ✅              | ❌                       | ❌        |
 | Update    | Store           | ✅              | ❌                       | ❌        |

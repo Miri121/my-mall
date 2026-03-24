@@ -469,7 +469,7 @@ erDiagram
         uuid id PK
         string name
         string slug UK
-        text url
+        text url "NOT NULL"
         text description
         string logo
         string coverImage
@@ -528,9 +528,10 @@ erDiagram
 
 - **VENDORS:** Independent entity with own authentication system (separate from users table, no userId FK)
 - **USERS:** Customer accounts with role field (customer, admin)
-- **STORES:** `url` field stores external website URL for iframe embedding
+- **STORES:** `url` field stores external website URL for iframe embedding (REQUIRED - NOT NULL)
 - **PRODUCTS:** `images` field is JSON array storing URLs/paths (no separate PRODUCT_IMAGES table)
 - **CATEGORIES:** Self-referential with parentId for hierarchical categories
+- **AUDIT_LOGS:** Belongs to admin_db (Admin Service database)
 
 ---
 
@@ -673,13 +674,13 @@ graph TB
     end
 
     subgraph "Backend Layer"
-        Express[Express.js]
+        NestJS[NestJS Framework]
         Prisma[Prisma ORM]
+        RabbitMQ[RabbitMQ Message Broker]
     end
 
     subgraph "Database Layer"
-        PostgreSQL[PostgreSQL] or
-        MongoDB[MongoDB]
+        PostgreSQL[PostgreSQL]
     end
 
     subgraph "Build & Dev Tools"
@@ -699,9 +700,10 @@ graph TB
     TanStackQuery --> Axios
     ReactAuthKit --> JWT
 
-    Axios --> Express
-    Express --> Prisma
-    Prisma --> PostgreSQL or MongoDB
+    Axios --> NestJS
+    NestJS --> Prisma
+    NestJS --> RabbitMQ
+    Prisma --> PostgreSQL
 
     Nx --> Vite
     Vite --> TypeScript
