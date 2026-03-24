@@ -317,7 +317,7 @@ libs/
 
 - Node.js 18+
 - pnpm
-- PostgreSQL or MongoDB database
+- PostgreSQL database
 - Git
 
 ### Initial Setup

@@ -666,11 +666,11 @@
 ### Backend Stack
 
 - **Runtime:** Node.js
-- **Framework:** Express.js
-- **Database:** PostgreSQL or MongoDB
+- **Framework:** NestJS (with Express adapter)
+- **Database:** PostgreSQL
 - **ORM:** Prisma
 - **Authentication:** JWT + bcrypt
-- **Validation:** express-validator
+- **Validation:** class-validator (NestJS)
 - **File Upload:** multer
 - **Security:** helmet, cors
 
