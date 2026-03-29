@@ -7,6 +7,7 @@
 ## 🌐 Domain Structure
 
 ### Production Domains
+
 ```
 mall.yourplatform.com      → Mall App (Customer Interface)
 vendor.yourplatform.com    → Vendor App (Vendor Dashboard)
@@ -15,6 +16,7 @@ api.yourplatform.com       → Backend API
 ```
 
 ### Staging Domains (Optional)
+
 ```
 mall.staging.yourplatform.com      → Mall App (Staging)
 vendor.staging.yourplatform.com    → Vendor App (Staging)
@@ -44,12 +46,14 @@ api.yourplatform.com        → Points to Railway/backend hosting IP
 ## 🔒 SSL/TLS Certificates
 
 ### Option 1: Wildcard Certificate (Recommended)
+
 - Single certificate: `*.yourplatform.com`
 - Covers all subdomains
 - Easier to manage
 - Most hosting platforms provide this automatically
 
 ### Option 2: Individual Certificates
+
 - Separate certificate for each subdomain
 - More granular control
 - Slightly more complex management
@@ -63,6 +67,7 @@ api.yourplatform.com        → Points to Railway/backend hosting IP
 ### Frontend Apps (Vercel - Recommended)
 
 #### Mall App
+
 ```yaml
 Project: mall-app
 Domain: mall.yourplatform.com
@@ -74,6 +79,7 @@ Environment Variables:
 ```
 
 #### Vendor App
+
 ```yaml
 Project: vendor-app
 Domain: vendor.yourplatform.com
@@ -85,6 +91,7 @@ Environment Variables:
 ```
 
 #### Admin App
+
 ```yaml
 Project: admin-app
 Domain: admin.yourplatform.com
@@ -133,16 +140,18 @@ const allowedOrigins = [
   'http://localhost:4202',
 ];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
 ```
 
 ---
@@ -223,6 +232,7 @@ jobs:
 ## 🌍 Environment Variables by App
 
 ### Mall App (Customer)
+
 ```env
 VITE_API_URL=https://api.yourplatform.com
 VITE_APP_NAME=Mall
@@ -233,6 +243,7 @@ VITE_SENTRY_DSN=your-sentry-dsn
 ```
 
 ### Vendor App
+
 ```env
 VITE_API_URL=https://api.yourplatform.com
 VITE_APP_NAME=Vendor
@@ -242,6 +253,7 @@ VITE_SENTRY_DSN=your-sentry-dsn
 ```
 
 ### Admin App
+
 ```env
 VITE_API_URL=https://api.yourplatform.com
 VITE_APP_NAME=Admin
@@ -250,8 +262,13 @@ VITE_SENTRY_DSN=your-sentry-dsn
 ```
 
 ### API Server
+
 ```env
 DATABASE_URL=postgresql://user:password@host:5432/dbname
+REDIS_HOST=your-redis-host.railway.app
+REDIS_PORT=6379
+REDIS_PASSWORD=your-redis-password
+REDIS_TLS=true
 JWT_SECRET=your-super-secret-jwt-key
 JWT_REFRESH_SECRET=your-super-secret-refresh-key
 JWT_EXPIRES_IN=24h
@@ -266,6 +283,29 @@ SENTRY_DSN=your-sentry-dsn
 NODE_ENV=production
 PORT=3000
 ```
+
+**Redis Configuration Options:**
+
+**Option 1: Railway Redis Plugin (Recommended)**
+
+- Automatic provisioning with Railway
+- Environment variables auto-injected
+- Cost: ~$5-15/month
+- Setup: Add Redis plugin in Railway dashboard
+
+**Option 2: Upstash Redis (Serverless)**
+
+- Serverless, pay-per-request
+- Global replication available
+- Cost: Free tier available, then ~$0-30/month
+- Setup: Create database at upstash.com, copy connection URL
+
+**Option 3: Redis Cloud**
+
+- Fully managed Redis
+- High availability with replication
+- Cost: Free tier (30MB), then ~$10-50/month
+- Setup: Create database at redis.com, copy connection details
 
 ---
 
@@ -296,20 +336,50 @@ export const analyticsConfig = {
 ## 🔍 Health Checks
 
 ### API Health Check Endpoint
+
 ```typescript
 // apps/api/src/routes/health.routes.ts
-app.get('/health', (req, res) => {
+app.get('/health', async (req, res) => {
+  const redisStatus = await checkRedisHealth();
+  const dbStatus = await checkDatabaseHealth();
+
   res.json({
-    status: 'ok',
+    status: redisStatus && dbStatus ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV,
+    services: {
+      redis: redisStatus ? 'connected' : 'disconnected',
+      database: dbStatus ? 'connected' : 'disconnected',
+    },
   });
+});
+
+app.get('/health/redis', async (req, res) => {
+  try {
+    const pong = await redis.ping();
+    const info = await redis.info('stats');
+    res.json({
+      status: 'healthy',
+      redis: pong === 'PONG' ? 'connected' : 'disconnected',
+      stats: parseRedisInfo(info),
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'unhealthy',
+      redis: 'disconnected',
+      error: error.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 ```
 
 ### Frontend Health Checks
+
 Each app should have a health check route:
+
 - `https://mall.yourplatform.com/health`
 - `https://vendor.yourplatform.com/health`
 - `https://admin.yourplatform.com/health`
@@ -321,6 +391,7 @@ Each app should have a health check route:
 ### Quick Rollback Steps
 
 1. **Vercel (Frontend Apps)**
+
    - Go to Vercel dashboard
    - Select the project
    - Navigate to "Deployments"
@@ -328,6 +399,7 @@ Each app should have a health check route:
    - Click "Promote to Production"
 
 2. **Railway (Backend API)**
+
    - Go to Railway dashboard
    - Select the service
    - Navigate to "Deployments"
@@ -343,26 +415,44 @@ Each app should have a health check route:
 ## 📝 Deployment Checklist
 
 ### Pre-Deployment
+
 - [ ] All tests passing
 - [ ] Environment variables configured
 - [ ] DNS records set up
 - [ ] SSL certificates configured
 - [ ] Database migrations ready
 - [ ] Backup database
+- [ ] **Redis instance provisioned and configured**
+- [ ] **Redis connection tested**
 - [ ] CORS settings verified
 
 ### Deployment
+
+- [ ] **Deploy Redis first (if not using managed service)**
 - [ ] Deploy API first
 - [ ] Run database migrations
+- [ ] **Verify Redis connectivity from API**
+- [ ] **Warm Redis cache with initial data (optional)**
 - [ ] Deploy Mall app
 - [ ] Deploy Vendor app
 - [ ] Deploy Admin app
 - [ ] Verify all health checks
+- [ ] **Verify Redis cache is working (check hit rates)**
 
 ### Post-Deployment
+
 - [ ] Test login on all apps
 - [ ] Test CRUD operations
 - [ ] Verify CORS working
+- [ ] **Monitor Redis metrics:**
+  - [ ] Check cache hit rate (target > 80%)
+  - [ ] Monitor memory usage
+  - [ ] Verify TTL expiration working
+  - [ ] Check connection count
+- [ ] **Test Redis-dependent features:**
+  - [ ] Rate limiting working correctly
+  - [ ] Session management functional
+  - [ ] Cached responses returning quickly
 - [ ] Check error tracking (Sentry)
 - [ ] Monitor performance
 - [ ] Check analytics tracking
@@ -403,4 +493,3 @@ Each app should have a health check route:
 
 **Status:** ✅ Deployment strategy confirmed and documented
 **Next Step:** Proceed with Phase 1 implementation
-

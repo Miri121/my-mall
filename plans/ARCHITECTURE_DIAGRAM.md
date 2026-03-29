@@ -42,6 +42,7 @@ graph TB
         AuthService[Auth Service<br/>Port 3005<br/>NestJS]
         AdminService[Admin Service<br/>Port 3006<br/>NestJS]
         RabbitMQ[RabbitMQ<br/>Port 5672<br/>Message Broker]
+        Redis[Redis<br/>Port 6379<br/>Cache Layer]
     end
 
     subgraph "Data Layer"
@@ -103,6 +104,14 @@ graph TB
     AuthService --> RabbitMQ
     AdminService --> RabbitMQ
 
+    Gateway --> Redis
+    VendorService --> Redis
+    UserService --> Redis
+    StoreService --> Redis
+    ProductService --> Redis
+    AuthService --> Redis
+    AdminService --> Redis
+
     VendorService --> VendorDB
     UserService --> UserDB
     StoreService --> StoreDB
@@ -141,6 +150,10 @@ graph LR
         RabbitMQ[RabbitMQ<br/>Port 5672]
     end
 
+    subgraph "Cache Layer"
+        Redis[Redis<br/>Port 6379]
+    end
+
     Client -->|HTTP/REST| Gateway
     Gateway -->|HTTP| Vendor
     Gateway -->|HTTP| User
@@ -148,6 +161,14 @@ graph LR
     Gateway -->|HTTP| Product
     Gateway -->|HTTP| Auth
     Gateway -->|HTTP| Admin
+
+    Gateway -.->|Cache| Redis
+    Vendor -.->|Cache| Redis
+    User -.->|Cache| Redis
+    Store -.->|Cache| Redis
+    Product -.->|Cache| Redis
+    Auth -.->|Cache| Redis
+    Admin -.->|Cache| Redis
 
     Vendor -.->|Events| RabbitMQ
     User -.->|Events| RabbitMQ
@@ -596,7 +617,8 @@ graph TB
 
     subgraph "Backend Hosting - Railway"
         APIDeploy[API Server<br/>api.domain.com]
-        DBDeploy[(PostgreSQL or MongoDB<br/>Database)]
+        DBDeploy[(PostgreSQL<br/>Database)]
+        RedisDeploy[Redis<br/>Cache Layer]
     end
 
     subgraph "File Storage"
@@ -622,6 +644,7 @@ graph TB
     AdminDeploy --> APIDeploy
 
     APIDeploy --> DBDeploy
+    APIDeploy --> RedisDeploy
     APIDeploy --> S3
 
     MallDeploy --> Sentry
@@ -677,10 +700,12 @@ graph TB
         NestJS[NestJS Framework]
         Prisma[Prisma ORM]
         RabbitMQ[RabbitMQ Message Broker]
+        RedisLib[Redis Cache Layer]
     end
 
     subgraph "Database Layer"
         PostgreSQL[PostgreSQL]
+        RedisDB[Redis]
     end
 
     subgraph "Build & Dev Tools"
@@ -703,7 +728,9 @@ graph TB
     Axios --> NestJS
     NestJS --> Prisma
     NestJS --> RabbitMQ
+    NestJS --> RedisLib
     Prisma --> PostgreSQL
+    RedisLib --> RedisDB
 
     Nx --> Vite
     Vite --> TypeScript

@@ -713,6 +713,7 @@
 > **Architecture:** The backend uses **7 NestJS microservices** with **RabbitMQ** for inter-service communication.
 >
 > **Service Breakdown:**
+>
 > - API Gateway (Port 3000) - Single entry point, JWT validation, routing
 > - Vendor Service (Port 3001) - Vendor CRUD operations
 > - User Service (Port 3002) - User (Customer) CRUD operations
@@ -768,6 +769,7 @@
 - [ ] Install CORS: Already included in NestJS
 - [ ] Install logging: `winston`, `nest-winston`
 - [ ] Install Swagger for API docs: `@nestjs/swagger`, `swagger-ui-express`
+- [ ] **Install Redis client: `ioredis`, `@types/ioredis`**
 
 #### 7.1.5 Setup Microservices Project Structure
 
@@ -787,6 +789,29 @@
   docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
   ```
 - [ ] Access RabbitMQ Management UI: http://localhost:15672 (guest/guest)
+
+#### 7.1.7 Configure Redis
+
+- [ ] Install Redis locally or use Docker:
+  ```bash
+  docker run -d --name redis -p 6379:6379 redis:7-alpine redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+  ```
+- [ ] Test Redis connection:
+  ```bash
+  docker exec -it redis redis-cli ping
+  # Should return: PONG
+  ```
+- [ ] Create Redis module in shared library:
+  - [ ] Generate shared Redis library: `nx g @nx/js:lib redis --directory=shared`
+  - [ ] Create [`RedisModule`](libs/shared/redis/src/lib/redis.module.ts) with global scope
+  - [ ] Create [`RedisService`](libs/shared/redis/src/lib/redis.service.ts) with ioredis client
+  - [ ] Export Redis configuration from [`@org/config`](libs/shared/config/src/lib/redis.config.ts)
+- [ ] Configure Redis connection settings:
+  - [ ] Host: `process.env.REDIS_HOST || 'localhost'`
+  - [ ] Port: `process.env.REDIS_PORT || 6379`
+  - [ ] Password: `process.env.REDIS_PASSWORD` (optional for development)
+  - [ ] Retry strategy: Exponential backoff
+  - [ ] Max retries: 3
 - [ ] Create exchanges for each service:
   - [ ] `vendor.exchange` (topic)
   - [ ] `user.exchange` (topic)
@@ -829,7 +854,10 @@
 - [ ] Configure Express adapter in API Gateway
 - [ ] Install and configure Swagger for API documentation
 - [ ] Set up CORS, helmet, compression middleware
-- [ ] Configure rate limiting
+- [ ] **Import RedisModule from [`@org/redis`](libs/shared/redis/src/index.ts)**
+- [ ] **Configure Redis-based rate limiting middleware**
+  - [ ] Track requests per IP/user with 60-second sliding window
+  - [ ] Set limits: login (5/min), register (3/min), default (100/min)
 - [ ] Set up request logging with Winston
 
 #### 7.2.2 Implement JWT Authentication Middleware
@@ -867,7 +895,13 @@
 
 - [ ] Create response transformation interceptors
 - [ ] Handle errors from microservices
-- [ ] Implement response caching (Redis)
+- [ ] **Implement Redis-based response caching**
+  - [ ] Cache GET responses for products (15 min TTL)
+  - [ ] Cache GET responses for stores (30 min TTL)
+  - [ ] Cache GET responses for categories (1 hour TTL)
+  - [ ] Cache search results (5 min TTL)
+  - [ ] Implement cache key generation based on route + query params
+  - [ ] Add cache invalidation on POST/PUT/DELETE operations
 - [ ] Add response compression
 
 ---
@@ -884,6 +918,7 @@
 - [ ] Create `vendors` table
 
 - [ ] Create `vendors` table
+
   - [ ] id (UUID, primary key)
   - [ ] email (unique, not null)
   - [ ] password (hashed, not null)
@@ -904,6 +939,7 @@
 
 - [ ] Create Prisma schema for user_db
 - [ ] Create `users` table
+
   - [ ] id (UUID, primary key)
   - [ ] email (unique, not null)
   - [ ] password (hashed, not null)
@@ -938,6 +974,7 @@
   - [ ] updatedAt (timestamp)
 
 **Store URL Field Clarification:**
+
 - [ ] Products are stored in Product Service database and managed by vendors
 - [ ] The `url` field is **REQUIRED** and used to embed vendor's external website via iframe
 - [ ] The store page displays the vendor's external website through iframe
@@ -953,6 +990,7 @@
 
 - [ ] Create Prisma schema for product_db
 - [ ] Create `products` table
+
   - [ ] id (UUID, primary key)
   - [ ] name (not null)
   - [ ] description (text, nullable)
@@ -968,6 +1006,7 @@
   - [ ] **Note:** Images stored in S3/Cloudinary, database stores paths as JSON array
 
 - [ ] Create `categories` table
+
   - [ ] id (UUID, primary key)
   - [ ] name (not null)
   - [ ] slug (unique, not null)
@@ -985,6 +1024,7 @@
 
 - [ ] Create Prisma schema for auth_db
 - [ ] Create `credentials` table
+
   - [ ] id (UUID, primary key)
   - [ ] userId (UUID, nullable) - Reference to user
   - [ ] vendorId (UUID, nullable) - Reference to vendor
@@ -997,28 +1037,41 @@
   - [ ] updatedAt (timestamp)
 
 - [ ] Create `refresh_tokens` table
+
   - [ ] id (UUID, primary key)
   - [ ] credentialId (foreign key to credentials)
   - [ ] token (unique, not null)
   - [ ] expiresAt (timestamp)
   - [ ] createdAt (timestamp)
+  - [ ] **Note:** Refresh tokens are also stored in Redis for faster validation (7-day TTL)
 
 - [ ] Create `password_resets` table
+
   - [ ] id (UUID, primary key)
   - [ ] email (not null)
   - [ ] token (unique, not null)
   - [ ] expiresAt (timestamp)
   - [ ] usedAt (timestamp, nullable)
   - [ ] createdAt (timestamp)
+  - [ ] **Note:** Password reset tokens are primarily stored in Redis (1-hour TTL), PostgreSQL is backup
 
 - [ ] Run Prisma migrations: `npx prisma migrate dev --name init`
 - [ ] Generate Prisma client: `npx prisma generate`
+
+- [ ] **Configure Redis integration for Auth Service:**
+  - [ ] Import RedisModule
+  - [ ] Implement session management in Redis (24-hour TTL)
+  - [ ] Implement refresh token caching (7-day TTL)
+  - [ ] Implement password reset token storage (1-hour TTL)
+  - [ ] Implement login attempt tracking (15-min TTL, max 5 attempts)
+  - [ ] Implement OAuth state management (10-min TTL)
 
 #### 7.3.6 Admin Service Database (admin_db)
 
 **Location:** Admin Service (Port 3006)
 
 **Important:** Admin Service does NOT handle CRUD operations for vendors, users, or stores. It ONLY handles:
+
 - Platform statistics aggregation (by subscribing to events from other services)
 - Audit log management
 - Dashboard metrics calculation
@@ -1026,6 +1079,7 @@
 
 - [ ] Create Prisma schema for admin_db
 - [ ] Create `audit_logs` table
+
   - [ ] id (UUID, primary key)
   - [ ] userId (UUID, nullable) - Reference to user
   - [ ] vendorId (UUID, nullable) - Reference to vendor
@@ -1038,6 +1092,7 @@
   - [ ] createdAt (timestamp)
 
 - [ ] Create `platform_statistics` table
+
   - [ ] id (UUID, primary key)
   - [ ] date (date, unique)
   - [ ] totalVendors (integer)
@@ -1057,16 +1112,19 @@
 **Important:** Since each service has its own database, data consistency is maintained through RabbitMQ events.
 
 - [ ] When Vendor Service creates a vendor:
+
   - [ ] Publishes `vendor.created` event
   - [ ] Auth Service subscribes and creates credentials
   - [ ] Admin Service subscribes and updates statistics
 
 - [ ] When User Service creates a user:
+
   - [ ] Publishes `user.created` event
   - [ ] Auth Service subscribes and creates credentials
   - [ ] Admin Service subscribes and updates statistics
 
 - [ ] When Store Service creates a store:
+
   - [ ] Publishes `store.created` event
   - [ ] Admin Service subscribes and updates statistics
 
@@ -1286,6 +1344,7 @@ GOOGLE_CLIENT_SECRET=your-client-secret
 **Vendor Update Clarification:**
 
 Vendors have **LIMITED UPDATE PERMISSIONS**:
+
 - `PUT /api/vendors/:id` - **Admin only** (can update all fields: email, name, company, phone)
 - `PUT /api/vendors/me/password` - **Vendor self only** (can ONLY update own password)
 - **Important:** Vendors CANNOT update their profile fields (email, name, company, phone) - only admin can do this
@@ -1364,20 +1423,20 @@ Vendors have **LIMITED UPDATE PERMISSIONS**:
 - [ ] Create `create-vendor.dto.ts`
   - [ ] Use class-validator decorators
   - [ ] Validate email, password, name, companyName, phone
-  
 - [ ] Create `update-vendor.dto.ts`
   - [ ] Partial validation for updates
-  
 - [ ] Create `update-password.dto.ts`
   - [ ] Validate currentPassword, newPassword, confirmPassword
 
 #### 7.4.5 Implement RabbitMQ Event Publishing
 
 - [ ] Publish `vendor.created` event after successful creation
+
   - [ ] Event payload: { vendorId, email, name, companyName, createdAt }
   - [ ] Subscribers: Auth Service (create credentials), Admin Service (update stats)
 
 - [ ] Publish `vendor.updated` event after successful update
+
   - [ ] Event payload: { vendorId, changes, updatedAt }
   - [ ] Subscribers: Auth Service (sync credentials), Admin Service (update stats)
 
@@ -1388,6 +1447,7 @@ Vendors have **LIMITED UPDATE PERMISSIONS**:
 #### 7.4.6 Implement Event Subscribers
 
 - [ ] Subscribe to `store.created` event
+
   - [ ] Update vendor's store count (denormalized data)
 
 - [ ] Subscribe to `store.deleted` event
@@ -1402,6 +1462,7 @@ Vendors have **LIMITED UPDATE PERMISSIONS**:
 #### 7.4.8 API Endpoints Summary
 
 **Vendor Service Endpoints (accessed via API Gateway `/api/vendors/*`):**
+
 ```
 POST   /api/vendors              - Create vendor (Admin only)
 GET    /api/vendors              - List vendors (Admin only)
@@ -1484,6 +1545,15 @@ GET    /api/vendors/:id/stats    - Get vendor stats (Admin only)
   - [ ] `delete()` - Delete product
   - [ ] `uploadImages()` - Handle image uploads
   - [ ] `deleteImage()` - Delete image
+- [ ] **Implement Redis caching in Product Service:**
+  - [ ] Import RedisModule
+  - [ ] Cache individual products (15 min TTL)
+  - [ ] Cache product lists with filters (10 min TTL)
+  - [ ] Cache search results (5 min TTL)
+  - [ ] Cache category tree (1 hour TTL)
+  - [ ] Track product view counts in Redis
+  - [ ] Implement cache invalidation on create/update/delete
+  - [ ] Subscribe to RabbitMQ events for cache invalidation
 
 #### 7.6.3 Create Product Validators
 
@@ -1675,7 +1745,6 @@ SENDGRID_API_KEY=your-api-key
 
 - [ ] Create `create-category.dto.ts`
   - [ ] Validate name, slug, description, parentId
-  
 - [ ] Create `update-category.dto.ts`
   - [ ] Partial validation for updates
 
@@ -1690,6 +1759,7 @@ SENDGRID_API_KEY=your-api-key
 #### 7.9.6 API Endpoints Summary
 
 **Category Endpoints (accessed via API Gateway `/api/categories/*`):**
+
 ```
 GET    /api/categories              - List all categories (Public)
 GET    /api/categories/:id          - Get category (Public)
@@ -1834,6 +1904,7 @@ DELETE /api/categories/:id          - Delete category (Admin only)
 > **Important:** Testing microservices requires NestJS testing utilities and RabbitMQ event testing.
 
 - [ ] Test Auth Service (Port 3005)
+
   - [ ] Use NestJS testing module: `@nestjs/testing`
   - [ ] Test authentication logic
   - [ ] Test JWT token generation/validation
@@ -1842,22 +1913,26 @@ DELETE /api/categories/:id          - Delete category (Admin only)
   - [ ] Test RabbitMQ event publishing
 
 - [ ] Test Vendor Service (Port 3001)
+
   - [ ] Test vendor CRUD operations
   - [ ] Test Prisma database interactions
   - [ ] Test RabbitMQ event publishing (vendor.created, vendor.updated, vendor.deleted)
   - [ ] Test authorization guards
 
 - [ ] Test User Service (Port 3002)
+
   - [ ] Test user CRUD operations
   - [ ] Test Prisma database interactions
   - [ ] Test RabbitMQ event publishing (user.created, user.updated, user.deleted)
 
 - [ ] Test Store Service (Port 3003)
+
   - [ ] Test store CRUD operations
   - [ ] Test RabbitMQ event subscriptions (vendor.deleted)
   - [ ] Test RabbitMQ event publishing (store.created, store.updated, store.deleted)
 
 - [ ] Test Product Service (Port 3004)
+
   - [ ] Test product CRUD operations
   - [ ] Test category CRUD operations
   - [ ] Test RabbitMQ event subscriptions (store.deleted)
@@ -1865,12 +1940,14 @@ DELETE /api/categories/:id          - Delete category (Admin only)
   - [ ] Test search functionality
 
 - [ ] Test Admin Service (Port 3006)
+
   - [ ] Test statistics aggregation
   - [ ] Test audit log creation
   - [ ] Test RabbitMQ event subscriptions (all service events)
   - [ ] Test dashboard metrics calculation
 
 - [ ] Test API Gateway (Port 3000)
+
   - [ ] Test routing to microservices
   - [ ] Test JWT authentication middleware
   - [ ] Test rate limiting
