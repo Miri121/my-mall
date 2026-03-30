@@ -1355,118 +1355,456 @@
 
 ---
 
-## Phase 8: Testing
+## Phase 8: Testing with Playwright MCP
 
-### Task 8.1: Unit Testing
+> **Note**: All testing will be performed using Playwright with MCP (Model Context Protocol) integration.
+> Playwright MCP handles E2E testing, integration testing with test containers, and visual regression testing.
 
-#### Subtask 8.1.1: Setup Unit Testing
+### Task 8.1: Setup Playwright MCP Testing Infrastructure
 
-- Configure Vitest for all libraries
-- Create test utilities
-- Create mock data factories
-- Set up test coverage reporting
+#### Subtask 8.1.1: Configure Playwright MCP
 
-#### Subtask 8.1.2: Write Unit Tests for Shared Libraries
+- Install Playwright MCP dependencies
+- Configure Playwright MCP connection
+- Set up test environment configuration
+- Configure browser contexts (Chromium, Firefox, WebKit)
+- Set up parallel test execution
+- Configure test timeouts and retries
 
-- Test all utility functions (format, validation, string, array, object)
-- Test Zod schemas
-- Test API services
-- Test TanStack Query hooks
-- Test custom hooks
-- Aim for 80%+ coverage
+#### Subtask 8.1.2: Setup Test Containers for Integration Testing
 
-#### Subtask 8.1.3: Write Unit Tests for Feature Libraries
+- Install Testcontainers dependencies
+- Configure Docker for test containers
+- Create test container configurations:
+  - PostgreSQL test containers (6 databases)
+  - Redis test container
+  - RabbitMQ test container
+- Set up container lifecycle management (start before tests, cleanup after)
+- Configure container networking
+- Set up container health checks
 
-- Test auth components
-- Test vendor components
-- Test store components
-- Test product components
-- Test user components
-- Test search components
-- Aim for 80%+ coverage
+#### Subtask 8.1.3: Create Test Data Fixtures
 
-#### Subtask 8.1.4: Write Unit Tests for Backend
+- Create seed data for test database
+  - Test vendors
+  - Test stores (with valid external URLs)
+  - Test products
+  - Test users (customers)
+  - Test admin accounts
+- Create data cleanup scripts
+- Set up database reset between test runs
+- Create test data factories for dynamic data generation
 
-- Test all service methods
-- Test all controllers
-- Test middleware
-- Test guards
-- Test pipes
-- Test filters
-- Aim for 80%+ coverage
+#### Subtask 8.1.4: Setup Visual Regression Testing
 
-### Task 8.2: Integration Testing
+- Configure Playwright visual comparison
+- Set up screenshot storage
+- Create baseline screenshots for all pages
+- Configure visual diff thresholds
+- Set up visual regression reporting
+- Configure screenshot comparison options (full page, specific elements)
 
-#### Subtask 8.2.1: Setup Integration Testing
+### Task 8.2: Playwright MCP Tests - Mall App (Customer)
 
-- Configure test database
-- Create test fixtures
-- Set up test containers (Docker)
+#### Subtask 8.2.1: Authentication & Registration Tests
 
-#### Subtask 8.2.2: Write Integration Tests for Backend
+- Test user registration flow (complete form, validation, success)
+- Test user login flow (valid credentials, invalid credentials, error handling)
+- Test Google OAuth login flow
+- Test logout functionality
+- Test password reset flow (request, email, reset, login)
+- Test session persistence
+- Test redirect after login
 
-- Test API Gateway routing
-- Test Auth Service flows
-- Test Vendor Service CRUD
-- Test User Service CRUD
-- Test Store Service CRUD
-- Test Product Service CRUD
-- Test Admin Service statistics
-- Test RabbitMQ event flows
-- Test Redis caching
-- Test database operations
+#### Subtask 8.2.2: Store Browsing Tests
 
-### Task 8.3: End-to-End Testing
+- Test stores list page (display, pagination, loading states)
+- Test store search functionality
+- Test store filtering
+- Test store card interactions
+- Test store detail page (information, external iframe display)
+- Test navigation between stores
 
-#### Subtask 8.3.1: Setup E2E Testing
+#### Subtask 8.2.3: Product Browsing Tests
 
-- Configure Playwright
-- Create test users and data
-- Set up test environment
+- Test products list page (display, pagination, loading states)
+- Test product search functionality
+- Test product filtering (category, price range, store)
+- Test product sorting
+- Test product card interactions
+- Test product detail page (images, information, store link)
+- Test related products display
+- Test navigation between products
 
-#### Subtask 8.3.2: Write E2E Tests for Mall App
+#### Subtask 8.2.4: Search Functionality Tests
 
-- Test user registration flow
-- Test user login flow
-- Test browsing stores
-- Test browsing products
-- Test search functionality
-- Test product detail view
-- Test favorites functionality
-- Test profile management
+- Test global search bar
+- Test search suggestions/autocomplete
+- Test search results page
+- Test search with filters
+- Test empty search results
+- Test search pagination
 
-#### Subtask 8.3.3: Write E2E Tests for Vendor App
+#### Subtask 8.2.5: Customer Account Tests
+
+- Test account dashboard access (protected route)
+- Test profile viewing and editing
+- Test password change functionality
+- Test preferences management (language, theme)
+- Test favorites functionality (add, remove, view list)
+- Test browsing history (view, clear)
+- Test account deletion flow (confirmation, success)
+
+#### Subtask 8.2.6: Responsive & Accessibility Tests
+
+- Test mobile responsiveness (all pages)
+- Test tablet responsiveness (all pages)
+- Test desktop responsiveness (all pages)
+- Test RTL layout (Hebrew language)
+- Test keyboard navigation
+- Test screen reader compatibility
+
+#### Subtask 8.2.7: Visual Regression Tests - Mall App
+
+- Capture and compare screenshots for:
+  - Homepage (light/dark mode)
+  - Stores list page (light/dark mode)
+  - Store detail page with iframe (light/dark mode)
+  - Products list page (light/dark mode)
+  - Product detail page (light/dark mode)
+  - Search results page (light/dark mode)
+  - Account dashboard (light/dark mode)
+  - Profile page (light/dark mode)
+  - Favorites page (light/dark mode)
+- Test responsive layouts (mobile, tablet, desktop)
+- Test RTL layout screenshots (Hebrew)
+- Detect visual regressions in UI components
+- Compare against baseline screenshots
+
+### Task 8.3: Playwright MCP Tests - Vendor App
+
+#### Subtask 8.3.1: Vendor Authentication Tests
 
 - Test vendor login flow
-- Test product creation
-- Test product editing
-- Test product deletion
-- Test viewing assigned stores
-- Test password change
+- Test invalid credentials handling
+- Test password reset flow
+- Test session persistence
+- Test logout functionality
 
-#### Subtask 8.3.4: Write E2E Tests for Admin App
+#### Subtask 8.3.2: Vendor Dashboard Tests
+
+- Test dashboard access (protected route, vendor role required)
+- Test statistics display (product count, stores, metrics)
+- Test recent products display
+- Test navigation from dashboard
+
+#### Subtask 8.3.3: Product Management Tests
+
+- Test products list page (vendor's products only)
+- Test product search and filtering
+- Test product creation flow
+  - Form validation
+  - Image upload (single and multiple)
+  - Category selection
+  - Store selection
+  - Success notification
+  - Redirect to products list
+- Test product editing flow
+  - Load existing data
+  - Update fields
+  - Update images
+  - Success notification
+- Test product deletion flow
+  - Confirmation dialog
+  - Success notification
+  - Product removed from list
+- Test product detail view
+- Test ownership validation (cannot edit other vendors' products)
+
+#### Subtask 8.3.4: Store Viewing Tests (READ ONLY)
+
+- Test stores list page (assigned stores only)
+- Test store detail page (read-only, no edit buttons)
+- Test store products display
+- Test navigation between stores
+
+#### Subtask 8.3.5: Vendor Account Tests
+
+- Test profile viewing (read-only fields: email, name, company, phone)
+- Test password change functionality (ONLY editable field)
+- Test preferences management (language, theme)
+- Test that profile editing is disabled (except password)
+
+#### Subtask 8.3.6: Visual Regression Tests - Vendor App
+
+- Capture and compare screenshots for:
+  - Vendor dashboard (light/dark mode)
+  - Products list page (light/dark mode)
+  - Create product page (light/dark mode)
+  - Edit product page (light/dark mode)
+  - Product detail page (light/dark mode)
+  - Stores list page (light/dark mode)
+  - Store detail page (light/dark mode)
+  - Profile page (light/dark mode)
+- Test responsive layouts (mobile, tablet, desktop)
+- Test RTL layout screenshots (Hebrew)
+- Detect visual regressions in dashboard components
+- Compare against baseline screenshots
+
+### Task 8.4: Playwright MCP Tests - Admin App
+
+#### Subtask 8.4.1: Admin Authentication Tests
 
 - Test admin login flow
-- Test vendor CRUD operations
-- Test store CRUD operations
-- Test user CRUD operations
-- Test viewing products
-- Test analytics dashboard
-- Test audit logs
+- Test invalid credentials handling
+- Test session persistence
+- Test logout functionality
 
-### Task 8.4: Visual Regression Testing
+#### Subtask 8.4.2: Admin Dashboard Tests
 
-#### Subtask 8.4.1: Setup Visual Testing
+- Test dashboard access (protected route, admin role required)
+- Test platform statistics display
+- Test recent activity display
+- Test top vendors/stores/products display
+- Test navigation from dashboard
 
-- Configure visual regression tool (Percy or Chromatic)
-- Create baseline screenshots
+#### Subtask 8.4.3: Vendor Management Tests (Full CRUD)
 
-#### Subtask 8.4.2: Create Visual Tests
+- Test vendors list page
+- Test vendor search and filtering
+- Test vendor creation flow
+  - Form validation
+  - Email uniqueness check
+  - Success notification
+  - Email sent to vendor
+- Test vendor editing flow
+  - Load existing data
+  - Update all fields
+  - Success notification
+- Test vendor deletion flow
+  - Confirmation dialog
+  - Cascade effects (stores, products)
+  - Success notification
+- Test vendor detail view
+- Test vendor statistics
 
-- Test all UI components in Storybook
-- Test all page layouts
-- Test responsive designs
-- Test dark mode
+#### Subtask 8.4.4: Store Management Tests (Full CRUD)
+
+- Test stores list page
+- Test store search and filtering
+- Test store creation flow
+  - Form validation
+  - REQUIRED url field validation
+  - Vendor assignment
+  - Logo and cover image upload
+  - Success notification
+- Test store editing flow
+  - Load existing data
+  - Update all fields including url
+  - Update images
+  - Success notification
+- Test store deletion flow
+  - Confirmation dialog
+  - Cascade effects (products)
+  - Success notification
+- Test store detail view
+
+#### Subtask 8.4.5: User Management Tests (Full CRUD)
+
+- Test users list page
+- Test user search and filtering
+- Test user editing flow
+  - Load existing data
+  - Update fields
+  - Success notification
+- Test user deletion flow
+  - Confirmation dialog
+  - Success notification
+- Test user detail view
+
+#### Subtask 8.4.6: Product Viewing Tests (READ ONLY)
+
+- Test products list page (all products)
+- Test product search and filtering
+- Test product detail view (read-only, no edit buttons)
+- Test that product editing is disabled
+
+#### Subtask 8.4.7: Analytics & Audit Tests
+
+- Test analytics page
+- Test reports generation
+- Test audit logs page
+- Test audit log filtering
+- Test audit log search
+
+#### Subtask 8.4.8: Visual Regression Tests - Admin App
+
+- Capture and compare screenshots for:
+  - Admin dashboard (light/dark mode)
+  - Vendors list page (light/dark mode)
+  - Create vendor page (light/dark mode)
+  - Edit vendor page (light/dark mode)
+  - Vendor detail page (light/dark mode)
+  - Stores list page (light/dark mode)
+  - Create store page (light/dark mode)
+  - Edit store page (light/dark mode)
+  - Store detail page (light/dark mode)
+  - Users list page (light/dark mode)
+  - Edit user page (light/dark mode)
+  - Products list page (light/dark mode)
+  - Analytics page (light/dark mode)
+  - Audit logs page (light/dark mode)
+- Test responsive layouts (mobile, tablet, desktop)
+- Test RTL layout screenshots (Hebrew)
+- Detect visual regressions in admin components
+- Compare against baseline screenshots
+
+### Task 8.5: Playwright MCP Integration Tests - Backend with Test Containers
+
+> **Note**: These tests use Testcontainers to spin up isolated PostgreSQL, Redis, and RabbitMQ instances for integration testing.
+
+#### Subtask 8.5.1: Integration Test Setup
+
+- Start test containers before test suite
+  - PostgreSQL containers (6 databases)
+  - Redis container
+  - RabbitMQ container
+- Run database migrations on test containers
+- Seed test data
+- Configure services to connect to test containers
+- Clean up containers after test suite
+
+#### Subtask 8.5.2: API Gateway Integration Tests
+
+- Test routing to all microservices (with test containers)
+- Test JWT authentication middleware
+- Test rate limiting (Redis-based with test container)
+- Test response caching (Redis-based with test container)
+- Test CORS configuration
+- Test error handling
+- Verify container connectivity
+
+#### Subtask 8.5.3: Auth Service Integration Tests
+
+- Test login endpoint (all user types) with test database
+- Test registration endpoint with test database
+- Test token refresh endpoint
+- Test password reset flow with test database
+- Test session management (Redis test container)
+- Test login attempt tracking (Redis test container)
+- Test account lockout
+- Verify data persistence in test database
+
+#### Subtask 8.5.4: Vendor Service Integration Tests
+
+- Test vendor CRUD endpoints with test database
+- Test vendor events (RabbitMQ test container)
+- Test vendor caching (Redis test container)
+- Test authorization rules
+- Verify cascade operations in test database
+
+#### Subtask 8.5.5: User Service Integration Tests
+
+- Test user CRUD endpoints with test database
+- Test user events (RabbitMQ test container)
+- Test user caching (Redis test container)
+- Test authorization rules
+- Verify data persistence in test database
+
+#### Subtask 8.5.6: Store Service Integration Tests
+
+- Test store CRUD endpoints (url field required) with test database
+- Test store events (RabbitMQ test container)
+- Test store caching (Redis test container)
+- Test cascade operations with test database
+- Test authorization rules
+- Verify relationships with vendors and products
+
+#### Subtask 8.5.7: Product Service Integration Tests
+
+- Test product CRUD endpoints with test database
+- Test category CRUD endpoints with test database
+- Test search endpoints with test database
+- Test product events (RabbitMQ test container)
+- Test product caching (Redis test container)
+- Test search caching (Redis test container)
+- Test authorization rules
+- Verify relationships with stores and categories
+
+#### Subtask 8.5.8: Admin Service Integration Tests
+
+- Test statistics endpoints with test database
+- Test audit log endpoints with test database
+- Test admin events (RabbitMQ test container)
+- Test statistics caching (Redis test container)
+- Verify aggregated data from multiple services
+
+#### Subtask 8.5.9: Cross-Service Integration Tests
+
+- Test event flow between services (RabbitMQ test container)
+- Test cascade delete operations across services
+- Test data consistency across services
+- Test transaction rollback scenarios
+- Test service-to-service communication
+- Verify Redis cache invalidation across services
+
+### Task 8.6: Playwright MCP Tests - Cross-Cutting Concerns
+
+#### Subtask 8.6.1: Multi-Language Tests
+
+- Test language switching (English/Hebrew)
+- Test RTL layout for Hebrew
+- Test translations display correctly
+- Test language persistence
+
+#### Subtask 8.6.2: Theme Tests
+
+- Test light/dark mode switching
+- Test theme persistence
+- Test theme consistency across pages
+
+#### Subtask 8.6.3: Error Handling Tests
+
+- Test 404 pages
+- Test 500 error pages
+- Test network error handling
+- Test validation error display
+- Test toast notifications
+
+#### Subtask 8.6.4: Performance Tests
+
+- Test page load times
+- Test API response times
+- Test Redis cache hit rates
+- Test image loading optimization
+- Test lazy loading
+
+#### Subtask 8.6.5: Security Tests
+
+- Test unauthorized access attempts
+- Test role-based access control
+- Test CSRF protection
+- Test XSS prevention
+- Test SQL injection prevention
+- Test rate limiting enforcement
+
+### Task 8.7: Playwright MCP Test Reporting
+
+#### Subtask 8.7.1: Configure Test Reporting
+
+- Set up Playwright HTML reporter
+- Configure test results output
+- Set up screenshot capture on failure
+- Set up video recording for failed tests
+- Configure trace collection
+
+#### Subtask 8.7.2: CI/CD Integration
+
+- Integrate Playwright MCP tests in GitHub Actions
+- Run tests on pull requests
+- Run tests before deployment
+- Generate and publish test reports
+- Set up test failure notifications
 
 ---
 
@@ -1479,24 +1817,23 @@
 - Create .github/workflows/ci.yml
   - Run linting on pull requests
   - Run type checking
-  - Run unit tests
-  - Run integration tests
-  - Upload coverage to Codecov
+  - Run Playwright MCP tests
+  - Generate test reports
   - Comment PR with test results
   - Block merge if tests fail
 - Create .github/workflows/deploy-staging.yml
   - Trigger on push to main branch
   - Build all apps
-  - Run E2E tests
+  - Run Playwright MCP tests (full suite)
   - Deploy to staging environment
-  - Run smoke tests
+  - Run smoke tests with Playwright MCP
   - Notify team
 - Create .github/workflows/deploy-production.yml
   - Trigger on release tag
   - Build all apps with production config
-  - Run full test suite
+  - Run Playwright MCP tests (full suite)
   - Deploy to production
-  - Run smoke tests
+  - Run smoke tests with Playwright MCP
   - Create deployment notification
   - Rollback mechanism if health checks fail
 
@@ -1797,10 +2134,10 @@
   - Pull request process
   - Code review guidelines
 - Create docs/TESTING.md
-  - Testing strategy
-  - Writing unit tests
-  - Writing integration tests
-  - Writing E2E tests
+  - Playwright MCP testing strategy
+  - Running Playwright MCP tests
+  - Writing new test scenarios
+  - Test reporting and debugging
 - Create docs/DEPLOYMENT.md
   - Deployment strategy
   - Environment setup
@@ -1852,7 +2189,7 @@ This master implementation tasks file contains **ALL** tasks needed to build the
 - **Phase 5**: Domain Libraries (Customer, Vendor, Admin)
 - **Phase 6**: Application Development (Mall, Vendor, Admin Apps)
 - **Phase 7**: Backend API Development (7 Microservices, RabbitMQ, Redis, PostgreSQL)
-- **Phase 8**: Testing (Unit, Integration, E2E, Visual Regression)
+- **Phase 8**: Testing with Playwright MCP (Comprehensive E2E Testing)
 - **Phase 9**: Deployment & DevOps (CI/CD, Docker, Hosting, Monitoring, Security)
 - **Phase 10**: Documentation & Handoff (Code Docs, User Guides, Developer Docs, Handoff)
 
@@ -1874,7 +2211,8 @@ This master implementation tasks file contains **ALL** tasks needed to build the
 8. **react-auth-kit** - Authentication
 9. **shadcn/ui** - UI component library
 10. **Zod** - Runtime validation
-11. **Separate Subdomains** - mall.domain.com, vendor.domain.com, admin.domain.com
+11. **Playwright MCP** - Comprehensive E2E testing (no manual unit/integration tests)
+12. **Separate Subdomains** - mall.domain.com, vendor.domain.com, admin.domain.com
 
 ---
 
