@@ -4,28 +4,58 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/api"
+      "path": "./apps/mall"
     },
     {
-      "path": "./apps/shop"
+      "path": "./apps/vendor"
     },
     {
-      "path": "./libs/api/products"
+      "path": "./apps/admin"
     },
     {
-      "path": "./libs/shared/models"
+      "path": "./libs/shared/ui"
     },
     {
-      "path": "./libs/shop/data"
+      "path": "./libs/shared/data-access"
     },
     {
-      "path": "./libs/shop/feature-product-detail"
+      "path": "./libs/shared/types"
     },
     {
-      "path": "./libs/shop/feature-products"
+      "path": "./libs/shared/utils"
     },
     {
-      "path": "./libs/shop/shared-ui"
+      "path": "./libs/shared/config"
+    },
+    {
+      "path": "./libs/shared/i18n"
+    },
+    {
+      "path": "./libs/features/auth"
+    },
+    {
+      "path": "./libs/features/vendors"
+    },
+    {
+      "path": "./libs/features/stores"
+    },
+    {
+      "path": "./libs/features/products"
+    },
+    {
+      "path": "./libs/features/users"
+    },
+    {
+      "path": "./libs/features/search"
+    },
+    {
+      "path": "./libs/domain/customer"
+    },
+    {
+      "path": "./libs/domain/vendor-domain"
+    },
+    {
+      "path": "./libs/domain/admin-domain"
     }
   ]
 }

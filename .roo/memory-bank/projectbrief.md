@@ -45,9 +45,9 @@ My Mall is a modern, full-stack e-commerce platform built using an Nx monorepo a
 - **Resource Loading**: i18next-http-backend
 
 ### Development Tools
-- **Component Development**: Storybook v8.6.14 (React Vite)
+- **Component Development**: Storybook v9.1.20 (React Vite)
   - @storybook/react-vite
-  - @storybook/addon-essentials
+  - Compatible with Vite 7.x
 - **Testing Framework**: Vitest with @vitest/ui
 - **Testing Libraries**: 
   - @testing-library/react
@@ -195,39 +195,247 @@ Created [`.env.example`](../../.env.example) with comprehensive environment vari
 
 ## Project Structure
 
-### Current Applications
-- **apps/shop**: React-based storefront application (Vite)
-- **apps/api**: Express-based API server
+### Applications
+- **apps/mall**: Customer-facing mall application (Vite + React, port 4200)
+- **apps/vendor**: Vendor dashboard application (Vite + React, port 4201)
+- **apps/admin**: Admin control panel application (Vite + React, port 4202)
 
-### Current Libraries
-- **libs/shared/models**: Shared data models
-- **libs/api/products**: Product service library
-- **libs/shop/data**: Data access hooks for shop
-- **libs/shop/feature-products**: Product listing feature
-- **libs/shop/feature-product-detail**: Product detail feature
-- **libs/shop/shared-ui**: Shared UI components (cards, spinners, grids)
+### Shared Libraries
+- **libs/shared/ui**: Shared UI components library (Vite bundler, React)
+- **libs/shared/data-access**: Data access utilities and API clients (no bundler)
+- **libs/shared/types**: TypeScript type definitions (no bundler)
+- **libs/shared/utils**: Utility functions (no bundler)
+- **libs/shared/config**: Configuration management (no bundler)
+- **libs/shared/i18n**: Internationalization resources (no bundler)
+
+### Feature Libraries
+- **libs/features/auth**: Authentication feature (Vite bundler, React)
+- **libs/features/vendors**: Vendor management feature (Vite bundler, React)
+- **libs/features/stores**: Store management feature (Vite bundler, React)
+- **libs/features/products**: Product management feature (Vite bundler, React)
+- **libs/features/users**: User management feature (Vite bundler, React)
+- **libs/features/search**: Search functionality feature (Vite bundler, React)
+
+### Domain Libraries
+- **libs/domain/customer**: Customer domain logic (Vite bundler, React)
+- **libs/domain/vendor-domain**: Vendor domain logic (Vite bundler, React)
+- **libs/domain/admin-domain**: Admin domain logic (Vite bundler, React)
+
+## Phase 1, Task 1.2 - Workspace Structure Setup
+
+### Completed Subtasks
+
+#### 1.2.1: Generate Applications (3 apps) ✅
+Generated three React applications with Vite bundler and routing:
+
+1. **Mall App** (Customer-facing)
+   - Directory: `apps/mall`
+   - Port: 4200
+   - Features: Vite bundler, React Router, CSS styling
+   - Configuration: Custom port in [`vite.config.mts`](../../apps/mall/vite.config.mts)
+
+2. **Vendor App** (Vendor dashboard)
+   - Directory: `apps/vendor`
+   - Port: 4201
+   - Features: Vite bundler, React Router, CSS styling
+   - Configuration: Custom port in [`vite.config.mts`](../../apps/vendor/vite.config.mts)
+
+3. **Admin App** (Admin control panel)
+   - Directory: `apps/admin`
+   - Port: 4202
+   - Features: Vite bundler, React Router, CSS styling
+   - Configuration: Custom port in [`vite.config.mts`](../../apps/admin/vite.config.mts)
+
+**Command Pattern Used:**
+```bash
+npx nx g @nx/react:app <name> --bundler=vite --routing=true --style=css --unitTestRunner=none --e2eTestRunner=none --directory=apps/<name>
+```
+
+#### 1.2.2: Generate Shared Libraries (6 libs) ✅
+Generated shared libraries for cross-cutting concerns:
+
+1. **UI Library** - `libs/shared/ui`
+   - Bundler: Vite
+   - Purpose: Shared UI components
+   - Generator: `@nx/react:library`
+
+2. **Data Access Library** - `libs/shared/data-access`
+   - Bundler: None (TypeScript only)
+   - Purpose: API clients and data access utilities
+   - Generator: `@nx/js:library`
+
+3. **Types Library** - `libs/shared/types`
+   - Bundler: None (TypeScript only)
+   - Purpose: Shared TypeScript type definitions
+   - Generator: `@nx/js:library`
+
+4. **Utils Library** - `libs/shared/utils`
+   - Bundler: None (TypeScript only)
+   - Purpose: Utility functions and helpers
+   - Generator: `@nx/js:library`
+
+5. **Config Library** - `libs/shared/config`
+   - Bundler: None (TypeScript only)
+   - Purpose: Configuration management
+   - Generator: `@nx/js:library`
+
+6. **i18n Library** - `libs/shared/i18n`
+   - Bundler: None (TypeScript only)
+   - Purpose: Internationalization resources
+   - Generator: `@nx/js:library`
+
+#### 1.2.3: Generate Feature Libraries (6 libs) ✅
+Generated feature libraries with Vite bundler for UI-focused features:
+
+1. **Auth Feature** - `libs/features/auth`
+   - Authentication and authorization features
+   
+2. **Vendors Feature** - `libs/features/vendors`
+   - Vendor management functionality
+   
+3. **Stores Feature** - `libs/features/stores`
+   - Store management and catalog features
+   
+4. **Products Feature** - `libs/features/products`
+   - Product management and display
+   
+5. **Users Feature** - `libs/features/users`
+   - User management and profiles
+   
+6. **Search Feature** - `libs/features/search`
+   - Search and filtering functionality
+
+**Command Pattern Used:**
+```bash
+npx nx g @nx/react:library <name> --directory=libs/features/<name> --bundler=vite --unitTestRunner=none --component=false
+```
+
+#### 1.2.4: Generate Domain Libraries (3 libs) ✅
+Generated domain libraries for business logic:
+
+1. **Customer Domain** - `libs/domain/customer`
+   - Customer-specific business logic
+   
+2. **Vendor Domain** - `libs/domain/vendor-domain`
+   - Vendor-specific business logic
+   - Note: Named `vendor-domain` to avoid conflict with vendor app
+   
+3. **Admin Domain** - `libs/domain/admin-domain`
+   - Admin-specific business logic
+   - Note: Named `admin-domain` to avoid conflict with admin app
+
+**Command Pattern Used:**
+```bash
+npx nx g @nx/react:library <name> --directory=libs/domain/<name> --bundler=vite --unitTestRunner=none --component=false
+```
+
+#### 1.2.5: Delete Existing Example Code ✅
+Removed all sample/example code from the initial workspace:
+
+**Deleted Directories:**
+- `apps/shop/` - Sample shop application
+- `apps/api/` - Sample API application
+- `libs/shop/` - Sample shop libraries (data, feature-products, feature-product-detail, shared-ui)
+- `libs/api/` - Sample API libraries (products)
+- `libs/shared/models/` - Sample shared models
+
+**Cleanup Method:**
+```bash
+rmdir /s /q <directory>
+```
+
+#### 1.2.6: Update TypeScript Path Mappings ✅
+Updated [`tsconfig.base.json`](../../tsconfig.base.json) to reflect the new workspace structure:
+
+**Updated Path Mappings:**
+```typescript
+{
+  "@org/shared/ui": ["libs/shared/ui/src/index.ts"],
+  "@org/shared/data-access": ["libs/shared/data-access/src/index.ts"],
+  "@org/shared/types": ["libs/shared/types/src/index.ts"],
+  "@org/shared/utils": ["libs/shared/utils/src/index.ts"],
+  "@org/shared/config": ["libs/shared/config/src/index.ts"],
+  "@org/shared/i18n": ["libs/shared/i18n/src/index.ts"],
+  "@org/features/auth": ["libs/features/auth/src/index.ts"],
+  "@org/features/vendors": ["libs/features/vendors/src/index.ts"],
+  "@org/features/stores": ["libs/features/stores/src/index.ts"],
+  "@org/features/products": ["libs/features/products/src/index.ts"],
+  "@org/features/users": ["libs/features/users/src/index.ts"],
+  "@org/features/search": ["libs/features/search/src/index.ts"],
+  "@org/domain/customer": ["libs/domain/customer/src/index.ts"],
+  "@org/domain/vendor": ["libs/domain/vendor-domain/src/index.ts"],
+  "@org/domain/admin": ["libs/domain/admin-domain/src/index.ts"]
+}
+```
+
+**Actions:**
+- Removed old path mappings for deleted projects
+- Added new path mappings for all generated libraries
+- Verified paths match actual directory structure
+
+### Workspace Statistics
+
+**Total Projects Generated:** 18
+- Applications: 3
+- Shared Libraries: 6
+- Feature Libraries: 6
+- Domain Libraries: 3
+
+**Deleted Projects:** 9
+- Applications: 2 (shop, api)
+- Libraries: 7 (shop/*, api/*, shared/models)
+
+**Net Change:** +9 projects
 
 ## Issues Encountered
 
-### Storybook Version Compatibility
+### Task 1.2 - Workspace Structure Setup Issues
+
+#### Storybook + Vite 7 Peer Dependency Conflicts (RESOLVED)
+- **Issue**: npm install fails during library generation with ERESOLVE error
+- **Root Cause**: `@storybook/react-vite@8.6.14` requires Vite ^4.0.0 || ^5.0.0 || ^6.0.0, but project uses Vite 7.3.1
+- **Impact**:
+  - Exit code 1 on npm install after each library generation
+  - Libraries and configuration files ARE created successfully
+  - Only the npm install step fails
+- **Actual Behavior**: All 18 projects generated successfully despite npm errors
+- **Resolution** (2026-04-27):
+  - Upgraded Storybook from v8.6.14 to v9.1.20
+  - Storybook v9.1.20 officially supports Vite 7 (peer deps: `^5.0.0 || ^6.0.0 || ^7.0.0`)
+  - Removed `@storybook/addon-essentials@8.6.14` (not compatible with Storybook v9)
+  - No peer dependency warnings after upgrade
+  - Mall app successfully starts with Vite 7.3.1
+- **Status**: ✅ Resolved
+
+#### Naming Conflict - Domain Libraries
+- **Issue**: Cannot create `libs/domain/vendor` and `libs/domain/admin` due to naming conflicts
+- **Root Cause**: Nx prevents duplicate project names; `apps/vendor` and `apps/admin` already exist
+- **Resolution**: Created as `libs/domain/vendor-domain` and `libs/domain/admin-domain`
+- **Impact**: Path mappings use `@org/domain/vendor` and `@org/domain/admin` pointing to `-domain` directories
+- **Status**: Resolved with naming convention adjustment
+
+### Task 1.1 - Previous Issues
+
+#### Storybook Version Compatibility (RESOLVED)
 - **Issue**: Storybook v8.6.14 has peer dependency requirements for Vite ^4.0.0 || ^5.0.0 || ^6.0.0
 - **Current Vite**: v7.3.2
-- **Resolution**: Installed with `--legacy-peer-deps` flag
-- **Impact**: Functional but may require monitoring for compatibility issues
-- **Future Action**: Monitor Storybook releases for Vite 7 support or consider downgrading Vite if issues arise
+- **Initial Resolution**: Installed with `--legacy-peer-deps` flag
+- **Impact**: Functional but required monitoring for compatibility issues
+- **Final Resolution** (2026-04-27): Upgraded to Storybook v9.1.20 which fully supports Vite 7
+- **Status**: ✅ Resolved
 
 ### Package Vulnerabilities
 - **Status**: 48 vulnerabilities detected (18 moderate, 30 high)
 - **Note**: Common in npm ecosystems; most are in dev dependencies
 - **Action**: Deferred to later phase; will audit and address before production
 
-## Next Steps (Task 1.2)
+## Next Steps (Task 1.3)
 As per the master implementation plan:
-1. Generate shared libraries (types, utils, hooks, constants, UI)
-2. Generate API domain libraries (auth, cart, orders, users)
-3. Generate shop feature libraries (cart, checkout, auth)
-4. Update existing sample code to use new architecture
-5. Remove deprecated/sample code
+1. Set up authentication infrastructure
+2. Configure state management (Zustand + React Query)
+3. Implement routing structure with TanStack Router
+4. Create base UI components
+5. Set up i18n configuration
 
 ## Configuration Best Practices Applied
 
@@ -264,7 +472,11 @@ As per the master implementation plan:
 
 ---
 
-**Last Updated**: 2026-04-26  
-**Phase**: Phase 1 - Foundation  
-**Task**: 1.1 - Project Configuration & Dependencies  
+**Last Updated**: 2026-04-27
+**Phase**: Phase 1 - Foundation
+**Current Task**: 1.2 - Workspace Structure Setup
 **Status**: ✅ Complete
+
+**Completed Tasks:**
+- ✅ Task 1.1 - Project Configuration & Dependencies
+- ✅ Task 1.2 - Workspace Structure Setup

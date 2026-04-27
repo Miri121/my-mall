@@ -108,7 +108,10 @@
     "e2e": {
       "cache": true,
       "inputs": ["default", "^production"],
-      "outputs": ["{projectRoot}/test-results", "{projectRoot}/playwright-report"]
+      "outputs": [
+        "{projectRoot}/test-results",
+        "{projectRoot}/playwright-report"
+      ]
     },
     "@nx/esbuild:esbuild": {
       "cache": true,
