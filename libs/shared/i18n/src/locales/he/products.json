@@ -1,0 +1,29 @@
+{
+  "title": "מוצרים",
+  "create": "צור מוצר",
+  "edit": "ערוך מוצר",
+  "delete": "מחק מוצר",
+  "fields": {
+    "name": "שם המוצר",
+    "description": "תיאור",
+    "price": "מחיר",
+    "comparePrice": "מחיר להשוואה",
+    "category": "קטגוריה",
+    "store": "חנות",
+    "images": "תמונות"
+  },
+  "filters": {
+    "category": "קטגוריה",
+    "priceRange": "טווח מחירים",
+    "store": "חנות",
+    "sortBy": "מיין לפי"
+  },
+  "sort": {
+    "newest": "החדשים ביותר",
+    "oldest": "הישנים ביותר",
+    "priceLowHigh": "מחיר: נמוך לגבוה",
+    "priceHighLow": "מחיר: גבוה לנמוך",
+    "nameAZ": "שם: א-ת",
+    "nameZA": "שם: ת-א"
+  }
+}

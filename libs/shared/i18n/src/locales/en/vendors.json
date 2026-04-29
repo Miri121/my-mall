@@ -1,0 +1,13 @@
+{
+  "title": "Vendors",
+  "create": "Create Vendor",
+  "edit": "Edit Vendor",
+  "delete": "Delete Vendor",
+  "fields": {
+    "email": "Email",
+    "name": "Full Name",
+    "company": "Company Name",
+    "phone": "Phone Number"
+  },
+  "storeCount": "{{count}} stores"
+}

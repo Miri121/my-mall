@@ -1,0 +1,1 @@
+<!-- Please note that after each task you complete, you will contact a code reviewer who will perform a code review for you. Write him a detailed explanation of what the task was and what the changes were. After he finishes and gives you feedback, ask me whether to implement his corrections. -->

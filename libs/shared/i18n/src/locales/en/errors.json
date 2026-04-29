@@ -1,0 +1,8 @@
+{
+  "network": "Network error. Please check your connection.",
+  "unauthorized": "You are not authorized to perform this action.",
+  "notFound": "The requested resource was not found.",
+  "serverError": "Server error. Please try again later.",
+  "validation": "Please check your input and try again.",
+  "unknown": "An unexpected error occurred."
+}

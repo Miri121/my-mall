@@ -1,0 +1,29 @@
+{
+  "title": "Products",
+  "create": "Create Product",
+  "edit": "Edit Product",
+  "delete": "Delete Product",
+  "fields": {
+    "name": "Product Name",
+    "description": "Description",
+    "price": "Price",
+    "comparePrice": "Compare at Price",
+    "category": "Category",
+    "store": "Store",
+    "images": "Images"
+  },
+  "filters": {
+    "category": "Category",
+    "priceRange": "Price Range",
+    "store": "Store",
+    "sortBy": "Sort By"
+  },
+  "sort": {
+    "newest": "Newest First",
+    "oldest": "Oldest First",
+    "priceLowHigh": "Price: Low to High",
+    "priceHighLow": "Price: High to Low",
+    "nameAZ": "Name: A-Z",
+    "nameZA": "Name: Z-A"
+  }
+}

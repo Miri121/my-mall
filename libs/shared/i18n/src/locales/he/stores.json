@@ -1,0 +1,18 @@
+{
+  "title": "חנויות",
+  "create": "צור חנות",
+  "edit": "ערוך חנות",
+  "delete": "מחק חנות",
+  "fields": {
+    "name": "שם החנות",
+    "slug": "כתובת URL",
+    "url": "קישור לאתר חיצוני",
+    "description": "תיאור",
+    "logo": "לוגו",
+    "coverImage": "תמונת רקע",
+    "vendor": "ספק",
+    "isActive": "פעיל"
+  },
+  "visitStore": "בקר בחנות",
+  "productCount": "{{count}} מוצרים"
+}

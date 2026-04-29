@@ -1,0 +1,24 @@
+{
+  "title": "משתמשים",
+  "edit": "ערוך משתמש",
+  "delete": "מחק משתמש",
+  "fields": {
+    "name": "שם מלא",
+    "email": "דוא\"ל",
+    "role": "תפקיד",
+    "avatar": "תמונת פרופיל"
+  },
+  "roles": {
+    "customer": "לקוח",
+    "vendor": "ספק",
+    "admin": "מנהל"
+  },
+  "account": {
+    "profile": "פרופיל",
+    "password": "סיסמה",
+    "preferences": "העדפות",
+    "favorites": "מועדפים",
+    "history": "היסטוריה",
+    "deleteAccount": "מחק חשבון"
+  }
+}

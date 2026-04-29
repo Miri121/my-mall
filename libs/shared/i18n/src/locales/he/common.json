@@ -1,0 +1,38 @@
+{
+  "buttons": {
+    "save": "שמור",
+    "cancel": "ביטול",
+    "delete": "מחק",
+    "edit": "ערוך",
+    "create": "צור",
+    "search": "חפש",
+    "filter": "סנן",
+    "clear": "נקה",
+    "submit": "שלח",
+    "back": "חזור",
+    "next": "הבא",
+    "previous": "הקודם",
+    "close": "סגור",
+    "confirm": "אשר",
+    "upload": "העלה"
+  },
+  "labels": {
+    "loading": "טוען...",
+    "noResults": "לא נמצאו תוצאות",
+    "error": "שגיאה",
+    "success": "הצלחה",
+    "warning": "אזהרה",
+    "info": "מידע"
+  },
+  "navigation": {
+    "home": "בית",
+    "stores": "חנויות",
+    "products": "מוצרים",
+    "vendors": "ספקים",
+    "users": "משתמשים",
+    "account": "חשבון",
+    "dashboard": "לוח בקרה",
+    "settings": "הגדרות",
+    "logout": "התנתק"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "title": "Stores",
+  "create": "Create Store",
+  "edit": "Edit Store",
+  "delete": "Delete Store",
+  "fields": {
+    "name": "Store Name",
+    "slug": "URL Slug",
+    "url": "External Website URL",
+    "description": "Description",
+    "logo": "Logo",
+    "coverImage": "Cover Image",
+    "vendor": "Vendor",
+    "isActive": "Active"
+  },
+  "visitStore": "Visit Store",
+  "productCount": "{{count}} products"
+}

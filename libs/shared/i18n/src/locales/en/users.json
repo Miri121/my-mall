@@ -1,0 +1,24 @@
+{
+  "title": "Users",
+  "edit": "Edit User",
+  "delete": "Delete User",
+  "fields": {
+    "name": "Full Name",
+    "email": "Email",
+    "role": "Role",
+    "avatar": "Avatar"
+  },
+  "roles": {
+    "customer": "Customer",
+    "vendor": "Vendor",
+    "admin": "Administrator"
+  },
+  "account": {
+    "profile": "Profile",
+    "password": "Password",
+    "preferences": "Preferences",
+    "favorites": "Favorites",
+    "history": "History",
+    "deleteAccount": "Delete Account"
+  }
+}

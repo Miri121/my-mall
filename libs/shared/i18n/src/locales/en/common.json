@@ -1,0 +1,38 @@
+{
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "confirm": "Confirm",
+    "upload": "Upload"
+  },
+  "labels": {
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information"
+  },
+  "navigation": {
+    "home": "Home",
+    "stores": "Stores",
+    "products": "Products",
+    "vendors": "Vendors",
+    "users": "Users",
+    "account": "Account",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "logout": "Logout"
+  }
+}
