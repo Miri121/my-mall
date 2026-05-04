@@ -1,12 +1,11 @@
-import createStore from 'react-auth-kit/createStore';
+import createAuthStore from 'react-auth-kit/store/createAuthStore';
 import AuthProvider from 'react-auth-kit/AuthProvider';
 import type { ReactNode } from 'react';
 import type { User } from '@org/types';
 
 // Create auth store with cookie-based token storage
-const store = createStore<User>({
+const store = createAuthStore<User>('cookie', {
   authName: '_auth',
-  authType: 'cookie',
   cookieDomain: window.location.hostname,
   cookieSecure: window.location.protocol === 'https:',
 });
