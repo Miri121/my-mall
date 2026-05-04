@@ -5,20 +5,20 @@ import { z } from 'zod';
  * Represents a store entity with REQUIRED url field for external store links
  */
 export const StoreSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string().min(1, 'Store name is required').max(200),
   slug: z
     .string()
     .min(1, 'Slug is required')
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
-  url: z.string().url('Valid store URL is required'), // REQUIRED external store URL
+  url: z.url('Valid store URL is required'), // REQUIRED external store URL
   description: z.string().max(1000).optional().nullable(),
-  logo: z.string().url().optional().nullable(),
-  coverImage: z.string().url().optional().nullable(),
-  vendorId: z.string().uuid(),
+  logo: z.url().optional().nullable(),
+  coverImage: z.url().optional().nullable(),
+  vendorId: z.uuid(),
   isActive: z.boolean().default(true),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
 
 export type Store = z.infer<typeof StoreSchema>;
@@ -34,9 +34,9 @@ export const StoreCreateInputSchema = z.object({
     .string()
     .min(1, 'Slug is required')
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
-  url: z.string().url('Valid store URL is required'), // REQUIRED
+  url: z.url('Valid store URL is required'), // REQUIRED
   description: z.string().max(1000).optional(),
-  vendorId: z.string().uuid('Valid vendor ID is required'),
+  vendorId: z.uuid('Valid vendor ID is required'),
   isActive: z.boolean().optional().default(true),
 });
 
@@ -52,7 +52,7 @@ export const StoreUpdateInputSchema = z.object({
     .string()
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only')
     .optional(),
-  url: z.string().url('Valid store URL is required').optional(),
+  url: z.url('Valid store URL is required').optional(),
   description: z.string().max(1000).optional().nullable(),
   isActive: z.boolean().optional(),
 });
@@ -65,7 +65,7 @@ export type StoreUpdateInput = z.infer<typeof StoreUpdateInputSchema>;
  */
 export const StoreWithVendorSchema = StoreSchema.extend({
   vendor: z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     name: z.string(),
     company: z.string(),
   }),

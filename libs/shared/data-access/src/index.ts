@@ -38,6 +38,7 @@ export {
   useLogout,
   useResetPassword,
   useUpdatePassword,
+  useChangePassword,
   useCurrentUser,
   useRefreshToken,
 } from './lib/hooks/useAuth.js';

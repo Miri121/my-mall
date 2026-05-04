@@ -15,7 +15,9 @@ export function GoogleOAuthButton({ onSuccess }: GoogleOAuthButtonProps) {
     try {
       setError(null);
       // Placeholder for OAuth flow - will implement backend later
-      await loginWithGoogle.mutateAsync();
+      // TODO: Implement actual Google OAuth flow to get token
+      const googleToken = 'placeholder-google-token';
+      await loginWithGoogle.mutateAsync(googleToken);
       onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Google login failed');

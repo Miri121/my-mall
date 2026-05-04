@@ -30,6 +30,8 @@ export const API_ENDPOINTS = {
     verifyResetToken: '/auth/verify-reset/:token',
     /** Update password with reset token */
     updatePassword: '/auth/update-password',
+    /** Change password for authenticated user */
+    changePassword: '/auth/change-password',
     /** Get current authenticated user */
     me: '/auth/me',
   },

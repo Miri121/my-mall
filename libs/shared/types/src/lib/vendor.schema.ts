@@ -5,8 +5,8 @@ import { z } from 'zod';
  * Represents a vendor entity in the system
  */
 export const VendorSchema = z.object({
-  id: z.string().uuid(),
-  email: z.string().email(),
+  id: z.uuid(),
+  email: z.email(),
   name: z.string().min(1, 'Name is required').max(100),
   company: z.string().min(1, 'Company name is required').max(200),
   phone: z
@@ -14,8 +14,8 @@ export const VendorSchema = z.object({
     .min(1, 'Phone is required')
     .regex(/^[\d\s\-+()]+$/, 'Invalid phone format'),
   isActive: z.boolean().default(true),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
 
 export type Vendor = z.infer<typeof VendorSchema>;
@@ -25,7 +25,7 @@ export type Vendor = z.infer<typeof VendorSchema>;
  * Used when creating a new vendor (Admin only)
  */
 export const VendorCreateInputSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.email('Invalid email format'),
   name: z.string().min(1, 'Name is required').max(100),
   company: z.string().min(1, 'Company name is required').max(200),
   phone: z

@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from './card';
-import { Button } from './button';
 
 const meta: Meta<typeof Tabs> = {
   title: 'UI/Tabs',

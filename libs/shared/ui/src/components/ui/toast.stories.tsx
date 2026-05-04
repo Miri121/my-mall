@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from './button';
 import { useToast } from '../../hooks/use-toast';
 import { Toaster } from './toaster';
+import { ToastAction } from './toast';
 
 const ToastDemo = ({
   title,
@@ -75,10 +76,14 @@ const ToastWithAction = () => {
           toast({
             title: 'Update Available',
             description: 'A new version is available. Click to refresh.',
-            action: {
-              label: 'Refresh',
-              onClick: () => console.log('Refresh clicked'),
-            },
+            action: (
+              <ToastAction
+                altText="Refresh"
+                onClick={() => console.log('Refresh clicked')}
+              >
+                Refresh
+              </ToastAction>
+            ),
           });
         }}
       >

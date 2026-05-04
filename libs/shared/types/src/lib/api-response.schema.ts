@@ -9,7 +9,7 @@ export const ApiResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
     success: z.boolean(),
     data: dataSchema,
     message: z.string().optional(),
-    timestamp: z.string().datetime().optional(),
+    timestamp: z.date().optional(),
   });
 
 export type ApiResponse<T> = {
@@ -43,7 +43,7 @@ export const PaginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =
     data: z.array(itemSchema),
     meta: PaginationMetaSchema,
     message: z.string().optional(),
-    timestamp: z.string().datetime().optional(),
+    timestamp: z.date().optional(),
   });
 
 export type PaginatedResponse<T> = {
@@ -65,7 +65,7 @@ export const ApiErrorSchema = z.object({
     message: z.string(),
     details: z.record(z.string(), z.any()).optional(),
   }),
-  timestamp: z.string().datetime().optional(),
+  timestamp: z.date().optional(),
 });
 
 export type ApiError = z.infer<typeof ApiErrorSchema>;
@@ -81,7 +81,7 @@ export const ValidationErrorSchema = z.object({
     message: z.string(),
     fields: z.record(z.string(), z.array(z.string())), // field -> array of error messages
   }),
-  timestamp: z.string().datetime().optional(),
+  timestamp: z.date().optional(),
 });
 
 export type ValidationError = z.infer<typeof ValidationErrorSchema>;

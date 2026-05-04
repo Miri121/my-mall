@@ -60,7 +60,7 @@ export function LoginForm({
           {...register('email')}
           disabled={isSubmitting}
         />
-        {errors.email && <ErrorMessage message={errors.email.message} />}
+        {errors.email && <ErrorMessage message={errors.email.message ?? ''} />}
       </div>
 
       <div className="space-y-2">
@@ -72,7 +72,7 @@ export function LoginForm({
           {...register('password')}
           disabled={isSubmitting}
         />
-        {errors.password && <ErrorMessage message={errors.password.message} />}
+        {errors.password && <ErrorMessage message={errors.password.message ?? ''} />}
       </div>
 
       <div className="flex items-center space-x-2">

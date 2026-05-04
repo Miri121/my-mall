@@ -5,7 +5,7 @@ import {
   type ChangePasswordFormData,
 } from '@org/types';
 import { Button, Input, Label, ErrorMessage } from '@org/ui';
-import { useUpdatePassword } from '@org/data-access';
+import { useChangePassword } from '@org/data-access';
 import { useToast } from '@org/ui';
 import { useState } from 'react';
 
@@ -15,7 +15,7 @@ interface ChangePasswordFormProps {
 
 // Change password form component
 export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
-  const updatePasswordMutation = useUpdatePassword();
+  const changePasswordMutation = useChangePassword();
   const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +36,10 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
   const onSubmit = async (data: ChangePasswordFormData) => {
     try {
       setError(null);
-      await updatePasswordMutation.mutateAsync(data);
+      await changePasswordMutation.mutateAsync({
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      });
       toast({
         title: 'Success',
         description: 'Password changed successfully',
@@ -62,7 +65,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
           disabled={isSubmitting}
         />
         {errors.currentPassword && (
-          <ErrorMessage message={errors.currentPassword.message} />
+          <ErrorMessage message={errors.currentPassword.message ?? ''} />
         )}
       </div>
 
@@ -76,7 +79,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
           disabled={isSubmitting}
         />
         {errors.newPassword && (
-          <ErrorMessage message={errors.newPassword.message} />
+          <ErrorMessage message={errors.newPassword.message ?? ''} />
         )}
       </div>
 
@@ -90,7 +93,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
           disabled={isSubmitting}
         />
         {errors.confirmPassword && (
-          <ErrorMessage message={errors.confirmPassword.message} />
+          <ErrorMessage message={errors.confirmPassword.message ?? ''} />
         )}
       </div>
 

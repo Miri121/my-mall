@@ -4,13 +4,7 @@ import {
   ProfileUpdateFormDataSchema,
   type ProfileUpdateFormData,
 } from '@org/types';
-import {
-  Button,
-  Input,
-  Label,
-  ErrorMessage,
-  ImageUpload,
-} from '@org/ui';
+import { Button, Input, Label, ErrorMessage, ImageUpload } from '@org/ui';
 import { useUpdateProfile, useUploadAvatar } from '@org/data-access';
 import { useToast } from '@org/ui';
 import { useState } from 'react';
@@ -39,17 +33,18 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
     defaultValues: {
       name: user?.name || '',
       phone: user?.phone || '',
+      email: user?.email || '',
       avatar: user?.avatar || null,
       preferredLanguage: user?.preferredLanguage || 'en',
     },
   });
-
   const avatar = watch('avatar');
 
-  const handleAvatarUpload = async (file: File) => {
+  const handleAvatarUpload = async (file: File | null) => {
     try {
+      if (!file) return;
       const response = await uploadAvatarMutation.mutateAsync(file);
-      setValue('avatar', response.data.url);
+      setValue('avatar', response.avatar);
       toast({
         title: 'Success',
         description: 'Avatar uploaded successfully',
@@ -95,9 +90,9 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
           type="text"
           placeholder="Enter your name"
           {...register('name')}
-          disabled={isSubmitting}
+          disabled={uploadAvatarMutation.isPending || isSubmitting}
         />
-        {errors.name && <ErrorMessage message={errors.name.message} />}
+        {errors.name && <ErrorMessage message={errors.name.message ?? ''} />}
       </div>
 
       <div className="space-y-2">
@@ -119,9 +114,9 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
           type="tel"
           placeholder="Enter your phone number"
           {...register('phone')}
-          disabled={isSubmitting}
+          disabled={uploadAvatarMutation.isPending || isSubmitting}
         />
-        {errors.phone && <ErrorMessage message={errors.phone.message} />}
+        {errors.phone && <ErrorMessage message={errors.phone.message ?? ''} />}
       </div>
 
       <div className="space-y-2">
@@ -129,21 +124,29 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
         <select
           id="preferredLanguage"
           {...register('preferredLanguage')}
-          disabled={isSubmitting}
+          disabled={uploadAvatarMutation.isPending || isSubmitting}
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
         >
           <option value="en">English</option>
           <option value="he">עברית</option>
         </select>
         {errors.preferredLanguage && (
-          <ErrorMessage message={errors.preferredLanguage.message} />
+          <ErrorMessage message={errors.preferredLanguage.message ?? ''} />
         )}
       </div>
 
       {error && <ErrorMessage message={error} />}
 
-      <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? 'Updating...' : 'Update Profile'}
+      <Button
+        type="submit"
+        disabled={uploadAvatarMutation.isPending || isSubmitting}
+        className="w-full"
+      >
+        {uploadAvatarMutation.isPending
+          ? 'Uploading Avatar...'
+          : isSubmitting
+          ? 'Updating...'
+          : 'Update Profile'}
       </Button>
     </form>
   );

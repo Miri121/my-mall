@@ -76,7 +76,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
           {...register('name')}
           disabled={isSubmitting}
         />
-        {errors.name && <ErrorMessage message={errors.name.message} />}
+        {errors.name && <ErrorMessage message={errors.name.message ?? ''} />}
       </div>
 
       <div className="space-y-2">
@@ -88,7 +88,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
           {...register('email')}
           disabled={isSubmitting}
         />
-        {errors.email && <ErrorMessage message={errors.email.message} />}
+        {errors.email && <ErrorMessage message={errors.email.message ?? ''} />}
       </div>
 
       <div className="space-y-2">
@@ -100,7 +100,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
           {...register('phone')}
           disabled={isSubmitting}
         />
-        {errors.phone && <ErrorMessage message={errors.phone.message} />}
+        {errors.phone && <ErrorMessage message={errors.phone.message ?? ''} />}
       </div>
 
       <div className="space-y-2">
@@ -136,7 +136,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
             />
           </div>
         )}
-        {errors.password && <ErrorMessage message={errors.password.message} />}
+        {errors.password && <ErrorMessage message={errors.password.message ?? ''} />}
       </div>
 
       <div className="space-y-2">
@@ -149,7 +149,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
           disabled={isSubmitting}
         />
         {errors.confirmPassword && (
-          <ErrorMessage message={errors.confirmPassword.message} />
+          <ErrorMessage message={errors.confirmPassword.message ?? ''} />
         )}
       </div>
 
@@ -166,7 +166,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
         </Label>
       </div>
       {errors.acceptTerms && (
-        <ErrorMessage message={errors.acceptTerms.message} />
+        <ErrorMessage message={errors.acceptTerms.message ?? ''} />
       )}
 
       {error && <ErrorMessage message={error} />}

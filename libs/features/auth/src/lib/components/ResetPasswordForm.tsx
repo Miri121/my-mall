@@ -58,7 +58,7 @@ export function ResetPasswordForm({
           {...register('password')}
           disabled={isSubmitting}
         />
-        {errors.password && <ErrorMessage message={errors.password.message} />}
+        {errors.password && <ErrorMessage message={errors.password.message ?? ''} />}
       </div>
 
       <div className="space-y-2">
@@ -71,7 +71,7 @@ export function ResetPasswordForm({
           disabled={isSubmitting}
         />
         {errors.confirmPassword && (
-          <ErrorMessage message={errors.confirmPassword.message} />
+          <ErrorMessage message={errors.confirmPassword.message ?? ''} />
         )}
       </div>
 

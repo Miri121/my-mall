@@ -9,6 +9,7 @@ interface ImageUploadProps {
   className?: string;
   maxSize?: number;
   accept?: string;
+  disabled?: boolean;
 }
 
 export function ImageUpload({
@@ -17,6 +18,7 @@ export function ImageUpload({
   className,
   maxSize = 5 * 1024 * 1024,
   accept = 'image/*',
+  disabled = false,
 }: ImageUploadProps) {
   const [preview, setPreview] = React.useState<string | null>(value || null);
   const [isDragging, setIsDragging] = React.useState(false);
@@ -39,16 +41,19 @@ export function ImageUpload({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+    if (disabled) return;
     const file = e.dataTransfer.files[0];
     if (file) handleFile(file);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     const file = e.target.files?.[0];
     if (file) handleFile(file);
   };
 
   const handleRemove = () => {
+    if (disabled) return;
     setPreview(null);
     onChange(null);
     if (fileInputRef.current) {
@@ -63,6 +68,7 @@ export function ImageUpload({
         type="file"
         accept={accept}
         onChange={handleChange}
+        disabled={disabled}
         className="hidden"
       />
 
@@ -71,7 +77,10 @@ export function ImageUpload({
           <img
             src={preview}
             alt="Preview"
-            className="h-40 w-full rounded-lg object-cover"
+            className={cn(
+              'h-40 w-full rounded-lg object-cover',
+              disabled && 'opacity-50'
+            )}
           />
           <Button
             type="button"
@@ -79,6 +88,7 @@ export function ImageUpload({
             size="icon"
             className="absolute right-2 top-2 h-8 w-8"
             onClick={handleRemove}
+            disabled={disabled}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -86,18 +96,20 @@ export function ImageUpload({
       ) : (
         <div
           className={cn(
-            'flex h-40 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors',
-            isDragging
+            'flex h-40 flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors',
+            disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+            isDragging && !disabled
               ? 'border-primary bg-primary/5'
-              : 'border-muted-foreground/25 hover:border-primary/50'
+              : 'border-muted-foreground/25',
+            !disabled && !isDragging && 'hover:border-primary/50'
           )}
           onDrop={handleDrop}
           onDragOver={(e) => {
             e.preventDefault();
-            setIsDragging(true);
+            if (!disabled) setIsDragging(true);
           }}
           onDragLeave={() => setIsDragging(false)}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => !disabled && fileInputRef.current?.click()}
         >
           <Upload className="h-10 w-10 text-muted-foreground" />
           <p className="mt-2 text-sm text-muted-foreground">

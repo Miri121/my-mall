@@ -105,6 +105,23 @@ export function useUpdatePassword() {
 }
 
 /**
+ * Hook for changing password (authenticated user)
+ *
+ * Changes password for currently logged-in user.
+ */
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: ({
+      currentPassword,
+      newPassword,
+    }: {
+      currentPassword: string;
+      newPassword: string;
+    }) => authService.changePassword(currentPassword, newPassword),
+  });
+}
+
+/**
  * Hook for fetching current user
  *
  * Retrieves current authenticated user profile.

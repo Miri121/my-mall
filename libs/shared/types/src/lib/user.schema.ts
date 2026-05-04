@@ -12,14 +12,16 @@ export type UserRole = z.infer<typeof UserRole>;
  * Common fields for all user types
  */
 export const UserSchema = z.object({
-  id: z.string().uuid(),
-  email: z.string().email(),
+  id: z.uuid(),
+  email: z.email(),
   name: z.string().min(1, 'Name is required').max(100),
+  phone: z.string().min(1, 'Phone is required'),
   role: UserRole,
-  avatar: z.string().url().optional().nullable(),
+  avatar: z.url().optional().nullable(),
+  preferredLanguage: z.enum(['en', 'he']).default('en'),
   isActive: z.boolean().default(true),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
 
 export type User = z.infer<typeof UserSchema>;
@@ -30,8 +32,6 @@ export type User = z.infer<typeof UserSchema>;
  */
 export const CustomerSchema = UserSchema.extend({
   role: z.literal('customer'),
-  phone: z.string().optional().nullable(),
-  preferredLanguage: z.enum(['en', 'he']).default('en'),
 });
 
 export type Customer = z.infer<typeof CustomerSchema>;
@@ -43,8 +43,7 @@ export type Customer = z.infer<typeof CustomerSchema>;
 export const VendorUserSchema = UserSchema.extend({
   role: z.literal('vendor'),
   company: z.string().min(1).max(200),
-  phone: z.string().min(1, 'Phone is required'),
-  vendorId: z.string().uuid(), // Links to the Vendor entity
+  vendorId: z.uuid(), // Links to the Vendor entity
 });
 
 export type VendorUser = z.infer<typeof VendorUserSchema>;
@@ -65,7 +64,7 @@ export type Admin = z.infer<typeof AdminSchema>;
  * Used when creating a new user
  */
 export const UserCreateInputSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   name: z.string().min(1, 'Name is required').max(100),
   role: UserRole,
@@ -83,7 +82,7 @@ export type UserCreateInput = z.infer<typeof UserCreateInputSchema>;
 export const UserUpdateInputSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   phone: z.string().optional(),
-  avatar: z.string().url().optional().nullable(),
+  avatar: z.url().optional().nullable(),
   preferredLanguage: z.enum(['en', 'he']).optional(),
   isActive: z.boolean().optional(),
 });

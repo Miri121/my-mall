@@ -5,18 +5,18 @@ import { z } from 'zod';
  * Represents a product entity with pricing validation
  */
 export const ProductSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string().min(1, 'Product name is required').max(300),
   description: z.string().max(2000).optional().nullable(),
   price: z.number().positive('Price must be greater than 0'),
   comparePrice: z.number().positive().optional().nullable(),
   images: z.array(z.string().url()).default([]),
   categoryId: z.string().uuid().optional().nullable(),
-  storeId: z.string().uuid(),
-  vendorId: z.string().uuid(),
+  storeId: z.uuid(),
+  vendorId: z.uuid(),
   isActive: z.boolean().default(true),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 }).refine(
   (data) => {
     // If comparePrice exists, it must be greater than price
@@ -42,9 +42,9 @@ export const ProductCreateInputSchema = z.object({
   description: z.string().max(2000).optional(),
   price: z.number().positive('Price must be greater than 0'),
   comparePrice: z.number().positive().optional().nullable(),
-  images: z.array(z.string().url()).optional().default([]),
-  categoryId: z.string().uuid().optional().nullable(),
-  storeId: z.string().uuid('Valid store ID is required'),
+  images: z.array(z.url()).optional().default([]),
+  categoryId: z.uuid().optional().nullable(),
+  storeId: z.uuid('Valid store ID is required'),
   isActive: z.boolean().optional().default(true),
 }).refine(
   (data) => {
@@ -70,7 +70,7 @@ export const ProductUpdateInputSchema = z.object({
   description: z.string().max(2000).optional().nullable(),
   price: z.number().positive('Price must be greater than 0').optional(),
   comparePrice: z.number().positive().optional().nullable(),
-  categoryId: z.string().uuid().optional().nullable(),
+  categoryId: z.uuid().optional().nullable(),
   storeId: z.string().uuid().optional(),
   isActive: z.boolean().optional(),
 }).refine(
@@ -99,7 +99,7 @@ export const ProductWithDetailsSchema = ProductSchema.extend({
     slug: z.string(),
   }).optional().nullable(),
   store: z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     name: z.string(),
     slug: z.string(),
     logo: z.string().url().nullable(),
@@ -113,9 +113,9 @@ export type ProductWithDetails = z.infer<typeof ProductWithDetailsSchema>;
  * Used for filtering products in search/list views
  */
 export const ProductFiltersSchema = z.object({
-  categoryId: z.string().uuid().optional(),
-  storeId: z.string().uuid().optional(),
-  vendorId: z.string().uuid().optional(),
+  categoryId: z.uuid().optional(),
+  storeId: z.uuid().optional(),
+  vendorId: z.uuid().optional(),
   minPrice: z.number().positive().optional(),
   maxPrice: z.number().positive().optional(),
   search: z.string().optional(),

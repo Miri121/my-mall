@@ -5,16 +5,16 @@ import { z } from 'zod';
  * Represents a product category with optional parent-child hierarchy
  */
 export const CategorySchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string().min(1, 'Category name is required').max(100),
   slug: z
     .string()
     .min(1, 'Slug is required')
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
   description: z.string().max(500).optional().nullable(),
-  parentId: z.string().uuid().optional().nullable(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  parentId: z.uuid().optional().nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
 
 export type Category = z.infer<typeof CategorySchema>;
@@ -30,7 +30,7 @@ export const CategoryCreateInputSchema = z.object({
     .min(1, 'Slug is required')
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
   description: z.string().max(500).optional(),
-  parentId: z.string().uuid().optional().nullable(),
+  parentId: z.uuid().optional().nullable(),
 });
 
 export type CategoryCreateInput = z.infer<typeof CategoryCreateInputSchema>;
@@ -46,7 +46,7 @@ export const CategoryUpdateInputSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only')
     .optional(),
   description: z.string().max(500).optional().nullable(),
-  parentId: z.string().uuid().optional().nullable(),
+  parentId: z.uuid().optional().nullable(),
 });
 
 export type CategoryUpdateInput = z.infer<typeof CategoryUpdateInputSchema>;

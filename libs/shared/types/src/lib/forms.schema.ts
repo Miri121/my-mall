@@ -5,9 +5,9 @@ import { z } from 'zod';
  * Used for user/vendor/admin login
  */
 export const LoginFormDataSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.email('Invalid email format'),
   password: z.string().min(1, 'Password is required'),
-  rememberMe: z.boolean().optional().default(false),
+  rememberMe: z.boolean().optional(),
 });
 
 export type LoginFormData = z.infer<typeof LoginFormDataSchema>;
@@ -16,23 +16,25 @@ export type LoginFormData = z.infer<typeof LoginFormDataSchema>;
  * Register Form Data Schema
  * Used for customer registration
  */
-export const RegisterFormDataSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100),
-  email: z.string().email('Invalid email format'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(100),
-  confirmPassword: z.string().min(1, 'Please confirm your password'),
-  phone: z.string().optional(),
-  preferredLanguage: z.enum(['en', 'he']).optional().default('en'),
-  acceptTerms: z.boolean().refine((val) => val === true, {
-    message: 'You must accept the terms and conditions',
-  }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+export const RegisterFormDataSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required').max(100),
+    email: z.email('Invalid email format'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(100),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+    phone: z.string().optional(),
+    preferredLanguage: z.enum(['en', 'he']).optional().default('en'),
+    acceptTerms: z.boolean().refine((val) => val === true, {
+      message: 'You must accept the terms and conditions',
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 export type RegisterFormData = z.infer<typeof RegisterFormDataSchema>;
 
@@ -41,26 +43,30 @@ export type RegisterFormData = z.infer<typeof RegisterFormDataSchema>;
  * Used to request password reset
  */
 export const ForgotPasswordFormDataSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.email('Invalid email format'),
 });
 
-export type ForgotPasswordFormData = z.infer<typeof ForgotPasswordFormDataSchema>;
+export type ForgotPasswordFormData = z.infer<
+  typeof ForgotPasswordFormDataSchema
+>;
 
 /**
  * Reset Password Form Data Schema
  * Used to set new password after reset request
  */
-export const ResetPasswordFormDataSchema = z.object({
-  token: z.string().min(1, 'Reset token is required'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(100),
-  confirmPassword: z.string().min(1, 'Please confirm your password'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+export const ResetPasswordFormDataSchema = z
+  .object({
+    token: z.string().min(1, 'Reset token is required'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(100),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 export type ResetPasswordFormData = z.infer<typeof ResetPasswordFormDataSchema>;
 
@@ -68,22 +74,27 @@ export type ResetPasswordFormData = z.infer<typeof ResetPasswordFormDataSchema>;
  * Change Password Form Data Schema
  * Used when user wants to change their password
  */
-export const ChangePasswordFormDataSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password is required'),
-  newPassword: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(100),
-  confirmPassword: z.string().min(1, 'Please confirm your password'),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-}).refine((data) => data.currentPassword !== data.newPassword, {
-  message: 'New password must be different from current password',
-  path: ['newPassword'],
-});
+export const ChangePasswordFormDataSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(100),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: 'New password must be different from current password',
+    path: ['newPassword'],
+  });
 
-export type ChangePasswordFormData = z.infer<typeof ChangePasswordFormDataSchema>;
+export type ChangePasswordFormData = z.infer<
+  typeof ChangePasswordFormDataSchema
+>;
 
 /**
  * Profile Update Form Data Schema
@@ -92,7 +103,8 @@ export type ChangePasswordFormData = z.infer<typeof ChangePasswordFormDataSchema
 export const ProfileUpdateFormDataSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   phone: z.string().optional(),
-  avatar: z.string().url().optional().nullable(),
+  email: z.email('Invalid email format').optional(),
+  avatar: z.url().optional().nullable(),
   preferredLanguage: z.enum(['en', 'he']).optional(),
 });
 
@@ -111,4 +123,6 @@ export const VendorProfileUpdateFormDataSchema = z.object({
     .regex(/^[\d\s\-+()]+$/, 'Invalid phone format'),
 });
 
-export type VendorProfileUpdateFormData = z.infer<typeof VendorProfileUpdateFormDataSchema>;
+export type VendorProfileUpdateFormData = z.infer<
+  typeof VendorProfileUpdateFormDataSchema
+>;

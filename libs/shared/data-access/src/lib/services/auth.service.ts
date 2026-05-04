@@ -26,7 +26,7 @@ export const authService = {
    */
   async login(
     data: LoginFormData
-  ): Promise<ApiResponse<{ user: User; token: string }>> {
+  ): Promise<ApiResponse<{ user: User; token: string , refreshToken: string }>> {
     const response = await httpClient.post(API_ENDPOINTS.auth.login, data);
     return response.data;
   },
@@ -108,6 +108,24 @@ export const authService = {
     const response = await httpClient.post(API_ENDPOINTS.auth.updatePassword, {
       token,
       password,
+    });
+    return response.data;
+  },
+
+  /**
+   * Change password for authenticated user
+   *
+   * @param currentPassword - Current password
+   * @param newPassword - New password
+   * @returns Success message
+   */
+  async changePassword(
+    currentPassword: string,
+    newPassword: string
+  ): Promise<ApiResponse<{ message: string }>> {
+    const response = await httpClient.post(API_ENDPOINTS.auth.changePassword, {
+      currentPassword,
+      newPassword,
     });
     return response.data;
   },

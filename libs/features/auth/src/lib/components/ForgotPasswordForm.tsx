@@ -37,7 +37,7 @@ export function ForgotPasswordForm({
     try {
       setError(null);
       setSuccessMessage(null);
-      await resetPasswordMutation.mutateAsync(data);
+      await resetPasswordMutation.mutateAsync(data.email);
       setSuccessMessage('Check your email for a password reset link');
       onSuccess?.();
     } catch (err) {
@@ -58,7 +58,9 @@ export function ForgotPasswordForm({
           {...register('email')}
           disabled={isSubmitting}
         />
-        {errors.email && <ErrorMessage message={errors.email.message} />}
+        {errors.email && (
+          <ErrorMessage message={errors.email.message ?? 'Invalid email'} />
+        )}
       </div>
 
       {successMessage && (

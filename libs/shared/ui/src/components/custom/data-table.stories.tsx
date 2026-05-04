@@ -111,7 +111,9 @@ export const WithCustomCells: Story = {
         header: 'Price',
         accessorKey: 'price',
         sortable: true,
-        cell: (value) => <span className="font-medium">${value}</span>,
+        cell: (value) => (
+          <span className="font-medium">${value as number}</span>
+        ),
       },
       {
         header: 'Status',
