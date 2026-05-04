@@ -1,5 +1,22 @@
 {
   "name": "@org/mall",
   "version": "0.0.1",
-  "private": true
+  "private": true,
+  "nx": {
+    "projectType": "application",
+    "tags": [
+      "scope:mall"
+    ],
+    "targets": {
+      "serve": {
+        "dependsOn": []
+      },
+      "dev": {
+        "dependsOn": []
+      },
+      "preview": {
+        "dependsOn": []
+      }
+    }
+  }
 }

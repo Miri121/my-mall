@@ -3,10 +3,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ChangePasswordFormDataSchema,
   type ChangePasswordFormData,
-} from '@org/shared/types';
-import { Button, Input, Label, ErrorMessage } from '@org/shared/ui';
-import { useUpdatePassword } from '@org/shared/data-access';
-import { useToast } from '@org/shared/ui';
+} from '@org/types';
+import { Button, Input, Label, ErrorMessage } from '@org/ui';
+import { useUpdatePassword } from '@org/data-access';
+import { useToast } from '@org/ui';
 import { useState } from 'react';
 
 interface ChangePasswordFormProps {

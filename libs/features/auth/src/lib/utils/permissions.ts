@@ -1,4 +1,4 @@
-import type { User, UserRole } from '@org/shared/types';
+import type { User, UserRole } from '@org/types';
 
 // Permission levels
 export type Permission = 'read' | 'write' | 'delete' | 'admin';

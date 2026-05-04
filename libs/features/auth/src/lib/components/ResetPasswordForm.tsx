@@ -3,9 +3,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ResetPasswordFormDataSchema,
   type ResetPasswordFormData,
-} from '@org/shared/types';
-import { Button, Input, Label, ErrorMessage } from '@org/shared/ui';
-import { useUpdatePassword } from '@org/shared/data-access';
+} from '@org/types';
+import { Button, Input, Label, ErrorMessage } from '@org/ui';
+import { useUpdatePassword } from '@org/data-access';
 import { useState } from 'react';
 
 interface ResetPasswordFormProps {

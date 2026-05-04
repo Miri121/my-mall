@@ -1,5 +1,5 @@
-import { Button } from '@org/shared/ui';
-import { useLoginWithGoogle } from '@org/shared/data-access';
+import { Button } from '@org/ui';
+import { useLoginWithGoogle } from '@org/data-access';
 import { useState } from 'react';
 
 interface GoogleOAuthButtonProps {

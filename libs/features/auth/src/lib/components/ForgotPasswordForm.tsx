@@ -3,9 +3,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ForgotPasswordFormDataSchema,
   type ForgotPasswordFormData,
-} from '@org/shared/types';
-import { Button, Input, Label, ErrorMessage } from '@org/shared/ui';
-import { useResetPassword } from '@org/shared/data-access';
+} from '@org/types';
+import { Button, Input, Label, ErrorMessage } from '@org/ui';
+import { useResetPassword } from '@org/data-access';
 import { useState } from 'react';
 
 interface ForgotPasswordFormProps {

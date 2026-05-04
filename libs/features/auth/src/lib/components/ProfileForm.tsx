@@ -3,16 +3,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ProfileUpdateFormDataSchema,
   type ProfileUpdateFormData,
-} from '@org/shared/types';
+} from '@org/types';
 import {
   Button,
   Input,
   Label,
   ErrorMessage,
   ImageUpload,
-} from '@org/shared/ui';
-import { useUpdateProfile, useUploadAvatar } from '@org/shared/data-access';
-import { useToast } from '@org/shared/ui';
+} from '@org/ui';
+import { useUpdateProfile, useUploadAvatar } from '@org/data-access';
+import { useToast } from '@org/ui';
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -54,7 +54,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps) {
         title: 'Success',
         description: 'Avatar uploaded successfully',
       });
-    } catch (err) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to upload avatar',

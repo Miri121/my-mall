@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LoginFormDataSchema, type LoginFormData } from '@org/shared/types';
-import { Button, Input, Label, ErrorMessage } from '@org/shared/ui';
+import { LoginFormDataSchema, type LoginFormData } from '@org/types';
+import { Button, Input, Label, ErrorMessage } from '@org/ui';
 import { useAuth } from '../hooks/useAuth';
 import { useState } from 'react';
 

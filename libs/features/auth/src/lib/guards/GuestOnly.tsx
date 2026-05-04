@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { LoadingSpinner } from '@org/shared/ui';
+import { LoadingSpinner } from '@org/ui';
 import { useAuth } from '../hooks/useAuth';
 
 interface GuestOnlyProps {
@@ -31,5 +31,5 @@ export function GuestOnly({ children }: GuestOnlyProps) {
     return <Navigate to={redirectPath} replace />;
   }
 
-  return <>{children}</>;
+  return children;
 }

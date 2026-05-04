@@ -3,9 +3,9 @@ import useSignIn from 'react-auth-kit/hooks/useSignIn';
 import useSignOut from 'react-auth-kit/hooks/useSignOut';
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import useIsAuthenticated from 'react-auth-kit/hooks/useIsAuthenticated';
-import { useLogin, useLogout } from '@org/shared/data-access';
-import type { User, UserRole } from '@org/shared/types';
-import type { LoginFormData } from '@org/shared/types';
+import { useLogin, useLogout } from '@org/data-access';
+import type { User, UserRole } from '@org/types';
+import type { LoginFormData } from '@org/types';
 
 // Permission mapping based on user role
 const rolePermissions: Record<UserRole, string[]> = {

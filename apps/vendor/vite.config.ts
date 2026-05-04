@@ -1,19 +1,20 @@
 /// <reference types='vitest' />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../node_modules/.vite/apps/admin',
+  cacheDir: '../../node_modules/.vite/apps/vendor',
   server: {
-    port: 4202,
+    port: 4201,
     host: 'localhost',
   },
   preview: {
-    port: 4202,
+    port: 4201,
     host: 'localhost',
   },
-  plugins: [react()],
+  plugins: [react(), nxViteTsPaths()],
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [],

@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { LoadingSpinner, ErrorMessage } from '@org/shared/ui';
+import { LoadingSpinner, ErrorMessage } from '@org/ui';
 import { useAuth } from '../hooks/useAuth';
-import type { UserRole } from '@org/shared/types';
+import type { UserRole } from '@org/types';
 
 interface RequireRoleProps {
   children: ReactNode;
@@ -47,5 +47,5 @@ export function RequireRole({
     return <Navigate to={fallbackPath} replace />;
   }
 
-  return <>{children}</>;
+  return children;
 }

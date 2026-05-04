@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { LoadingSpinner } from '@org/shared/ui';
+import { LoadingSpinner } from '@org/ui';
 import { useAuth } from '../hooks/useAuth';
 
 interface RequireAuthProps {
@@ -25,5 +25,5 @@ export function RequireAuth({ children }: RequireAuthProps) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <>{children}</>;
+  return children;
 }

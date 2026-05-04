@@ -7,7 +7,7 @@ import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../../node_modules/.vite/libs/features/users',
+  cacheDir: '../../../node_modules/.vite/libs/shared/data-access',
   plugins: [
     react(),
     nxViteTsPaths(),
@@ -32,7 +32,7 @@ export default defineConfig(() => ({
     lib: {
       // Could also be a dictionary or array of multiple entry points.
       entry: 'src/index.ts',
-      name: '@org/users',
+      name: '@org/data-access',
       fileName: 'index',
       // Change this to the formats you want to support.
       // Don't forget to update your package.json as well.
