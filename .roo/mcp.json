@@ -9,7 +9,10 @@
 			"env": {
 				"DEFAULT_MINIMUM_TOKENS": "2000"
 			},
-			"alwaysAllow": []
+			"alwaysAllow": [
+				"resolve-library-id",
+				"query-docs"
+			]
 		}
 	}
 }
