@@ -1,9 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  RegisterFormDataSchema,
-  type RegisterFormData,
-} from '@org/types';
+import { RegisterFormDataSchema, type RegisterFormData } from '@org/types';
 import { Button, Input, Label, ErrorMessage } from '@org/ui';
 import { useRegister } from '@org/data-access';
 import { useState } from 'react';
@@ -136,7 +133,9 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
             />
           </div>
         )}
-        {errors.password && <ErrorMessage message={errors.password.message ?? ''} />}
+        {errors.password && (
+          <ErrorMessage message={errors.password.message ?? ''} />
+        )}
       </div>
 
       <div className="space-y-2">

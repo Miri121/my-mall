@@ -38,6 +38,7 @@ import {
   AvatarFallback,
 } from '@org/ui';
 import { formatDate, formatNumber } from '@org/utils';
+import type { Product } from '@org/types';
 
 interface StoreDetailProps {
   storeId: string;
@@ -61,8 +62,10 @@ export function StoreDetail({
   const [activeTab, setActiveTab] = useState('overview');
 
   const { data: storeData, isLoading, error } = useStore(storeId);
-  const { data: statsData, isLoading: statsLoading } = useStoreWithStats(storeId);
-  const { data: productsData, isLoading: productsLoading } = useStoreProducts(storeId);
+  const { data: statsData, isLoading: statsLoading } =
+    useStoreWithStats(storeId);
+  const { data: productsData, isLoading: productsLoading } =
+    useStoreProducts(storeId);
 
   const handleEdit = () => {
     if (onEdit) {
@@ -131,7 +134,7 @@ export function StoreDetail({
                   <StoreIcon className="h-8 w-8" />
                 </AvatarFallback>
               </Avatar>
-              
+
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <CardTitle className="text-2xl">{store.name}</CardTitle>
@@ -180,9 +183,7 @@ export function StoreDetail({
               <p className="font-mono text-sm mt-1">{store.id}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Slug
-              </p>
+              <p className="text-sm font-medium text-muted-foreground">Slug</p>
               <p className="mt-1">{store.slug}</p>
             </div>
             <div>
@@ -243,7 +244,9 @@ export function StoreDetail({
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="store">External Store</TabsTrigger>
-          <TabsTrigger value="products">Products ({products.length})</TabsTrigger>
+          <TabsTrigger value="products">
+            Products ({products.length})
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -267,9 +270,7 @@ export function StoreDetail({
                   <div className="flex justify-between">
                     <dt className="text-muted-foreground">Status:</dt>
                     <dd>
-                      <Badge
-                        variant={store.isActive ? 'default' : 'secondary'}
-                      >
+                      <Badge variant={store.isActive ? 'default' : 'secondary'}>
                         {store.isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </dd>
@@ -307,7 +308,8 @@ export function StoreDetail({
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-4">
-                Note: Some websites may not allow embedding in iframes due to security policies.
+                Note: Some websites may not allow embedding in iframes due to
+                security policies.
               </p>
             </CardContent>
           </Card>
@@ -329,19 +331,23 @@ export function StoreDetail({
                 />
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {products.map((product: any) => (
+                  {products.map((product: Product) => (
                     <div
                       key={product.id}
                       className="p-4 border rounded-lg hover:bg-accent/50 transition-colors"
                     >
                       <div className="space-y-2">
-                        <h4 className="font-medium line-clamp-2">{product.name}</h4>
+                        <h4 className="font-medium line-clamp-2">
+                          {product.name}
+                        </h4>
                         {product.price && (
                           <p className="text-lg font-bold">
                             ${product.price.toFixed(2)}
                           </p>
                         )}
-                        <Badge variant={product.isActive ? 'default' : 'secondary'}>
+                        <Badge
+                          variant={product.isActive ? 'default' : 'secondary'}
+                        >
                           {product.isActive ? 'Active' : 'Inactive'}
                         </Badge>
                       </div>

@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import {
@@ -75,12 +75,18 @@ export function StoreForm({
   // Fetch vendors for dropdown
   const { data: vendorsData, isLoading: vendorsLoading } = useVendors();
 
-  // Determine schema and form data type based on mode
-  const schema = isEditMode ? StoreUpdateInputSchema : StoreCreateInputSchema;
+  // Define FormData type that includes all possible fields from both create and update modes
+  type FormData = {
+    name: string;
+    slug: string;
+    url: string;
+    description?: string;
+    vendorId?: string; // Only required in create mode
+    isActive?: boolean;
+  };
 
-  type FormData = typeof isEditMode extends true
-    ? StoreUpdateInput & { isActive?: boolean }
-    : StoreCreateInput;
+  // Determine schema based on mode
+  const schema = isEditMode ? StoreUpdateInputSchema : StoreCreateInputSchema;
 
   const {
     register,
@@ -90,33 +96,35 @@ export function StoreForm({
     setValue,
     watch,
   } = useForm<FormData>({
-    resolver: zodResolver(schema) as any,
+    resolver: zodResolver(
+      schema
+    ) as Resolver<FormData>,
     defaultValues: isEditMode
-      ? ({
+      ? {
           name: store.name,
           slug: store.slug,
           url: store.url,
           description: store.description || '',
           isActive: store.isActive,
-        } as any)
-      : ({
+        }
+      : {
           name: '',
           slug: '',
           url: '',
           description: '',
           vendorId: '',
           isActive: true,
-        } as any),
+        },
   });
 
-  const nameValue = watch('name' as any);
-  const isActiveValue = watch('isActive' as any);
+  const nameValue = watch('name');
+  const isActiveValue = watch('isActive');
 
   // Auto-generate slug from name
   useEffect(() => {
     if (!isEditMode && nameValue) {
-      const generatedSlug = slugify(nameValue as string);
-      setValue('slug' as any, generatedSlug);
+      const generatedSlug = slugify(nameValue);
+      setValue('slug', generatedSlug);
     }
   }, [nameValue, isEditMode, setValue]);
 
@@ -129,11 +137,11 @@ export function StoreForm({
         url: store.url,
         description: store.description || '',
         isActive: store.isActive,
-      } as any);
+      });
     }
   }, [store, isEditMode, reset]);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: FormData) => {
     try {
       let resultStore: Store;
 
@@ -166,6 +174,16 @@ export function StoreForm({
         });
       } else {
         // Create store
+        // Ensure vendorId is present (should be validated by form, but TypeScript needs the check)
+        if (!data.vendorId) {
+          toast({
+            title: 'Error',
+            description: 'Vendor is required',
+            variant: 'destructive',
+          });
+          return;
+        }
+
         const createData: StoreCreateInput = {
           name: data.name,
           slug: data.slug,
@@ -245,7 +263,7 @@ export function StoreForm({
               id="name"
               type="text"
               placeholder="Nike Store"
-              {...register('name' as any)}
+              {...register('name')}
               disabled={isLoading}
             />
             {errors.name && (
@@ -262,7 +280,7 @@ export function StoreForm({
               id="slug"
               type="text"
               placeholder="nike-store"
-              {...register('slug' as any)}
+              {...register('slug')}
               disabled={isLoading}
             />
             {errors.slug && (
@@ -282,7 +300,7 @@ export function StoreForm({
               id="url"
               type="url"
               placeholder="https://store.example.com"
-              {...register('url' as any)}
+              {...register('url')}
               disabled={isLoading}
             />
             {errors.url && (
@@ -300,7 +318,7 @@ export function StoreForm({
               id="description"
               placeholder="Brief description of the store..."
               rows={4}
-              {...register('description' as any)}
+              {...register('description')}
               disabled={isLoading}
             />
             {errors.description && (
@@ -317,10 +335,8 @@ export function StoreForm({
                 Vendor <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={watch('vendorId' as any) || ''}
-                onValueChange={(value: string) =>
-                  setValue('vendorId' as any, value)
-                }
+                value={watch('vendorId') || ''}
+                onValueChange={(value: string) => setValue('vendorId', value)}
                 disabled={isLoading}
               >
                 <SelectTrigger id="vendorId">
@@ -336,7 +352,7 @@ export function StoreForm({
               </Select>
               {errors.vendorId && (
                 <p className="text-sm text-destructive">
-                  {(errors.vendorId as any).message}
+                  {errors.vendorId.message}
                 </p>
               )}
             </div>
@@ -377,7 +393,7 @@ export function StoreForm({
               <Select
                 value={isActiveValue ? 'active' : 'inactive'}
                 onValueChange={(value: string) =>
-                  setValue('isActive' as any, value === 'active')
+                  setValue('isActive', value === 'active')
                 }
                 disabled={isLoading}
               >
@@ -391,7 +407,7 @@ export function StoreForm({
               </Select>
               {errors.isActive && (
                 <p className="text-sm text-destructive">
-                  {(errors.isActive as any).message}
+                  {errors.isActive.message}
                 </p>
               )}
             </div>

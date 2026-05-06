@@ -35,7 +35,6 @@ import {
   Separator,
 } from '@org/ui';
 import { formatDate, formatRelativeTime } from '@org/utils';
-import type { User } from '@org/types';
 
 interface UserDetailProps {
   userId: string;

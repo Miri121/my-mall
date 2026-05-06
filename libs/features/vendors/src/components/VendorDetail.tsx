@@ -15,11 +15,7 @@ import {
   Store,
   Package,
 } from 'lucide-react';
-import {
-  useVendor,
-  useVendorStats,
-  useVendorStores,
-} from '@org/data-access';
+import { useVendor, useVendorStats, useVendorStores } from '@org/data-access';
 import {
   Card,
   CardContent,
@@ -37,6 +33,7 @@ import {
   Separator,
 } from '@org/ui';
 import { formatDate, formatNumber } from '@org/utils';
+import type { Store as StoreType } from '@org/types';
 
 interface VendorDetailProps {
   vendorId: string;
@@ -301,7 +298,7 @@ export function VendorDetail({
                 />
               ) : (
                 <div className="space-y-3">
-                  {stores.map((store: any) => (
+                  {stores.map((store: StoreType) => (
                     <div
                       key={store.id}
                       className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"

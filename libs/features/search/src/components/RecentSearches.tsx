@@ -26,20 +26,20 @@ export function RecentSearches({
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   useEffect(() => {
-    loadRecentSearches();
-  }, []);
-
-  const loadRecentSearches = () => {
-    try {
-      const stored = localStorage.getItem('recentSearches');
-      if (stored) {
-        const parsed = JSON.parse(stored) as string[];
-        setRecentSearches(parsed.slice(0, maxItems));
+    const loadRecentSearches = () => {
+      try {
+        const stored = localStorage.getItem('recentSearches');
+        if (stored) {
+          const parsed = JSON.parse(stored) as string[];
+          setRecentSearches(parsed.slice(0, maxItems));
+        }
+      } catch (error) {
+        console.error('Failed to load recent searches:', error);
       }
-    } catch (error) {
-      console.error('Failed to load recent searches:', error);
-    }
-  };
+    };
+
+    loadRecentSearches();
+  }, [maxItems]);
 
   const handleRemove = (query: string) => {
     try {

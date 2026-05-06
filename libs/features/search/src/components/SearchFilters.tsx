@@ -23,7 +23,7 @@ import {
 } from '@org/ui';
 import { useCategories, useStores } from '@org/data-access';
 import { cn } from '@org/utils';
-import type { ProductFilters } from '@org/types';
+import type { ProductFilters, Category, Store } from '@org/types';
 
 interface SearchFiltersProps {
   filters?: ProductFilters;
@@ -58,7 +58,10 @@ export function SearchFilters({
     setLocalFilters(filters);
   }, [filters]);
 
-  const handleFilterChange = (key: keyof ProductFilters, value: any) => {
+  const handleFilterChange = (
+    key: keyof ProductFilters,
+    value: string | number | null
+  ) => {
     const newFilters = { ...localFilters, [key]: value || undefined };
     setLocalFilters(newFilters);
     if (onFiltersChange) {
@@ -133,7 +136,7 @@ export function SearchFilters({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category: any) => (
+                {categories.map((category: Category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
@@ -156,7 +159,7 @@ export function SearchFilters({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Stores</SelectItem>
-                {stores.map((store: any) => (
+                {stores.map((store: Store) => (
                   <SelectItem key={store.id} value={store.id}>
                     {store.name}
                   </SelectItem>

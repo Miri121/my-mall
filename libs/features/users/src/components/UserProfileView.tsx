@@ -307,9 +307,7 @@ export function UserProfileView({
               <ul className="list-disc list-inside mt-2 space-y-1">
                 <li>Your profile and settings</li>
                 {user.role === 'customer' && (
-                  <>
-                    <li>Your favorites and browsing history</li>
-                  </>
+                  <li>Your favorites and browsing history</li>
                 )}
                 {user.role === 'vendor' && (
                   <>

@@ -4,7 +4,7 @@
  * Displays user information in a card layout with avatar and actions.
  */
 
-import { Edit, Eye, Trash2, UserCircle } from 'lucide-react';
+import { Edit, Eye, Trash2 } from 'lucide-react';
 import {
   Card,
   CardContent,

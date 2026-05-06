@@ -15,7 +15,7 @@ import {
   Button,
   Skeleton,
 } from '@org/ui';
-import { cn, formatCurrency, truncate } from '@org/utils';
+import { cn, formatCurrency } from '@org/utils';
 import type { Product, ProductWithDetails } from '@org/types';
 import { Link } from 'react-router-dom';
 
@@ -60,13 +60,13 @@ export function ProductCard({
   const firstImage = product.images?.[0];
 
   // Calculate discount percentage
-  const hasDiscount =
-    product.comparePrice && product.comparePrice > product.price;
-  const discountPercentage = hasDiscount
-    ? Math.round(
-        ((product.comparePrice! - product.price) / product.comparePrice!) * 100
-      )
-    : 0;
+  const discountPercentage =
+    product.comparePrice && product.comparePrice > product.price
+      ? Math.round(
+          ((product.comparePrice - product.price) / product.comparePrice) * 100
+        )
+      : 0;
+  const hasDiscount = discountPercentage > 0;
 
   return (
     <Card

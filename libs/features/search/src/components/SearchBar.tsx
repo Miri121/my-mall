@@ -5,7 +5,7 @@
  * and integration with search hooks.
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback ,useMemo} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, Loader2 } from 'lucide-react';
 import { Input, Button } from '@org/ui';
@@ -52,8 +52,11 @@ export function SearchBar({
     debouncedQuery.length >= 2
   );
 
-  const products = productsData?.data || [];
-  const stores = storesData?.data || [];
+  const products = useMemo(
+    () => productsData?.data || [],
+    [productsData?.data]
+  );
+  const stores = useMemo(() => storesData?.data || [], [storesData?.data]);
   const isLoading = isLoadingProducts || isLoadingStores;
   const totalResults = products.length + stores.length;
 

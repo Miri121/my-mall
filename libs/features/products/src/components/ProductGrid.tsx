@@ -5,7 +5,7 @@
  */
 
 import { useProducts } from '@org/data-access';
-import { EmptyState, LoadingSpinner } from '@org/ui';
+import { EmptyState } from '@org/ui';
 import { Package } from 'lucide-react';
 import { ProductCard } from './ProductCard';
 import type { QueryParams } from '@org/types';

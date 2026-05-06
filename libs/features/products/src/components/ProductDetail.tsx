@@ -26,7 +26,6 @@ import {
   Button,
   LoadingSpinner,
   ErrorMessage,
-  EmptyState,
   Separator,
 } from '@org/ui';
 import { formatCurrency, formatDate, cn } from '@org/utils';
@@ -115,11 +114,12 @@ export function ProductDetail({
   const currentImage = images[selectedImageIndex] || null;
   const hasDiscount =
     product.comparePrice && product.comparePrice > product.price;
-  const discountPercentage = hasDiscount
-    ? Math.round(
-        ((product.comparePrice! - product.price) / product.comparePrice!) * 100
-      )
-    : 0;
+  const discountPercentage =
+    hasDiscount && product.comparePrice
+      ? Math.round(
+          ((product.comparePrice - product.price) / product.comparePrice) * 100
+        )
+      : 0;
 
   const handlePreviousImage = () => {
     setSelectedImageIndex((prev) =>
@@ -238,9 +238,9 @@ export function ProductDetail({
                     </span>
                   )}
                 </div>
-                {hasDiscount && (
+                {hasDiscount && product.comparePrice && (
                   <p className="text-green-600 font-medium">
-                    Save {formatCurrency(product.comparePrice! - product.price)}{' '}
+                    Save {formatCurrency(product.comparePrice - product.price)}{' '}
                     ({discountPercentage}% off)
                   </p>
                 )}

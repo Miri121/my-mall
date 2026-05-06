@@ -62,7 +62,7 @@ export function ProductForm({
   onCancel,
   vendorStoreId,
 }: ProductFormProps) {
-  const isEditMode = mode === 'edit' && product;
+  const isEditMode = mode === 'edit' && !!product;
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const uploadImages = useUploadProductImages();
@@ -82,10 +82,6 @@ export function ProductForm({
     ? ProductUpdateInputSchema
     : ProductCreateInputSchema;
 
-  type FormData = typeof isEditMode extends true
-    ? ProductUpdateInput
-    : ProductCreateInput;
-
   const {
     register,
     handleSubmit,
@@ -93,18 +89,18 @@ export function ProductForm({
     reset,
     setValue,
     watch,
-  } = useForm<FormData>({
-    resolver: zodResolver(schema) as any,
+  } = useForm({
+    resolver: zodResolver(schema),
     defaultValues: isEditMode
-      ? ({
+      ? {
           name: product.name,
           description: product.description || '',
           price: product.price,
           comparePrice: product.comparePrice || undefined,
           categoryId: product.categoryId || undefined,
           storeId: product.storeId,
-        } as any)
-      : ({
+        }
+      : {
           name: '',
           description: '',
           price: 0,
@@ -112,11 +108,11 @@ export function ProductForm({
           categoryId: undefined,
           storeId: vendorStoreId || '',
           isActive: true,
-        } as any),
+        },
   });
 
-  const priceValue = watch('price' as any);
-  const comparePriceValue = watch('comparePrice' as any);
+  const priceValue = watch('price');
+  const comparePriceValue = watch('comparePrice');
 
   // Reset form when product changes
   useEffect(() => {
@@ -128,7 +124,7 @@ export function ProductForm({
         comparePrice: product.comparePrice || undefined,
         categoryId: product.categoryId || undefined,
         storeId: product.storeId,
-      } as any);
+      });
       setExistingImages(product.images || []);
     }
   }, [product, isEditMode, reset]);
@@ -155,10 +151,14 @@ export function ProductForm({
     setExistingImages(existingImages.filter((_, i) => i !== index));
   };
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ProductCreateInput | ProductUpdateInput) => {
     try {
       // Validate price comparison
-      if (data.comparePrice && data.comparePrice <= data.price) {
+      if (
+        data.comparePrice &&
+        data.price !== undefined &&
+        data.comparePrice <= data.price
+      ) {
         toast({
           title: 'Validation Error',
           description: 'Compare price must be greater than price',
@@ -174,9 +174,16 @@ export function ProductForm({
         const updateData: ProductUpdateInput = {
           name: data.name,
           description: data.description || null,
-          price: parseFloat(data.price),
+          price:
+            data.price !== undefined
+              ? typeof data.price === 'number'
+                ? data.price
+                : parseFloat(data.price)
+              : undefined,
           comparePrice: data.comparePrice
-            ? parseFloat(data.comparePrice)
+            ? typeof data.comparePrice === 'number'
+              ? data.comparePrice
+              : parseFloat(data.comparePrice)
             : null,
           categoryId: data.categoryId || null,
           storeId: data.storeId,
@@ -201,12 +208,46 @@ export function ProductForm({
         });
       } else {
         // Create product
+        // Ensure name is present (required by ProductCreateInputSchema)
+        if (!data.name) {
+          toast({
+            title: 'Validation Error',
+            description: 'Product name is required',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        // Ensure price is present (required by ProductCreateInputSchema)
+        if (data.price === undefined || data.price === null) {
+          toast({
+            title: 'Validation Error',
+            description: 'Product price is required',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        if (data.storeId === undefined || data.storeId === null) {
+          toast({
+            title: 'Validation Error',
+            description: 'Product storeId is required',
+            variant: 'destructive',
+          });
+          return;
+        }
+
         const createData: ProductCreateInput = {
           name: data.name,
           description: data.description || undefined,
-          price: parseFloat(data.price),
+          price:
+            typeof data.price === 'number'
+              ? data.price
+              : parseFloat(data.price || ""),
           comparePrice: data.comparePrice
-            ? parseFloat(data.comparePrice)
+            ? typeof data.comparePrice === 'number'
+              ? data.comparePrice
+              : parseFloat(data.comparePrice)
             : undefined,
           categoryId: data.categoryId || undefined,
           storeId: data.storeId,
@@ -283,7 +324,7 @@ export function ProductForm({
               id="name"
               type="text"
               placeholder="Nike Air Max"
-              {...register('name' as any)}
+              {...register('name')}
               disabled={isLoading}
             />
             {errors.name && (
@@ -298,7 +339,7 @@ export function ProductForm({
               id="description"
               placeholder="Product description..."
               rows={4}
-              {...register('description' as any)}
+              {...register('description')}
               disabled={isLoading}
             />
             {errors.description && (
@@ -320,7 +361,7 @@ export function ProductForm({
                 step="0.01"
                 min="0"
                 placeholder="99.99"
-                {...register('price' as any, { valueAsNumber: true })}
+                {...register('price', { valueAsNumber: true })}
                 disabled={isLoading}
               />
               {errors.price && (
@@ -338,7 +379,7 @@ export function ProductForm({
                 step="0.01"
                 min="0"
                 placeholder="149.99"
-                {...register('comparePrice' as any, { valueAsNumber: true })}
+                {...register('comparePrice', { valueAsNumber: true })}
                 disabled={isLoading}
               />
               {errors.comparePrice && (
@@ -360,9 +401,9 @@ export function ProductForm({
           <div className="space-y-2">
             <Label htmlFor="categoryId">Category</Label>
             <Select
-              value={watch('categoryId' as any) || 'none'}
+              value={watch('categoryId') || 'none'}
               onValueChange={(value: string) =>
-                setValue('categoryId' as any, value === 'none' ? null : value)
+                setValue('categoryId', value === 'none' ? undefined : value)
               }
               disabled={isLoading}
             >
@@ -380,7 +421,7 @@ export function ProductForm({
             </Select>
             {errors.categoryId && (
               <p className="text-sm text-destructive">
-                {(errors.categoryId as any).message}
+                {errors.categoryId.message}
               </p>
             )}
           </div>
@@ -391,13 +432,9 @@ export function ProductForm({
               Store <span className="text-destructive">*</span>
             </Label>
             <Select
-              value={watch('storeId' as any) || ''}
-              onValueChange={(value: string) =>
-                setValue('storeId' as any, value)
-              }
-              disabled={
-                isLoading || (isEditMode ? true : false) || !!vendorStoreId
-              }
+              value={watch('storeId') || ''}
+              onValueChange={(value: string) => setValue('storeId', value)}
+              disabled={isLoading || isEditMode || !!vendorStoreId}
             >
               <SelectTrigger id="storeId">
                 <SelectValue placeholder="Select a store" />
@@ -412,7 +449,7 @@ export function ProductForm({
             </Select>
             {errors.storeId && (
               <p className="text-sm text-destructive">
-                {(errors.storeId as any).message}
+                {errors.storeId.message}
               </p>
             )}
             {isEditMode && (

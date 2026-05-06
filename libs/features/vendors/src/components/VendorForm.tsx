@@ -41,7 +41,14 @@ interface VendorFormProps {
   canManageStatus?: boolean;
 }
 
-type FormData = VendorCreateInput & { isActive?: boolean };
+type FormData = {
+  email?: string;
+  name?: string;
+  company?: string;
+  phone?: string;
+  password?: string;
+  isActive?: boolean;
+};
 
 /**
  * VendorForm handles creating and editing vendors
@@ -58,16 +65,12 @@ export function VendorForm({
   const updateVendor = useUpdateVendor();
 
   // Determine schema based on mode
-  const schema = isEditMode
-    ? VendorUpdateInputSchema.extend({
-        isActive: VendorUpdateInputSchema.shape.isActive,
-      })
-    : VendorCreateInputSchema;
+  const schema = isEditMode ? VendorUpdateInputSchema : VendorCreateInputSchema;
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
     setValue,
     watch,
@@ -128,7 +131,22 @@ export function VendorForm({
           onSuccess(result);
         }
       } else {
-        // Create vendor
+        // Create vendor - validate required fields
+        if (
+          !data.email ||
+          !data.name ||
+          !data.company ||
+          !data.phone ||
+          !data.password
+        ) {
+          toast({
+            title: 'Error',
+            description: 'All fields are required',
+            variant: 'destructive',
+          });
+          return;
+        }
+
         const createData: VendorCreateInput = {
           email: data.email,
           name: data.name,

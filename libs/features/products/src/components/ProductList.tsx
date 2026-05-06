@@ -31,7 +31,7 @@ import {
   AvatarFallback,
 } from '@org/ui';
 import { formatCurrency, formatDate } from '@org/utils';
-import type { ProductWithDetails, Category } from '@org/types';
+import type { ProductWithDetails, Category, Store } from '@org/types';
 
 interface ProductListProps {
   onCreateClick?: () => void;
@@ -197,7 +197,7 @@ export function ProductList({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Stores</SelectItem>
-                  {stores.map((store: any) => (
+                  {stores.map((store: Store) => (
                     <SelectItem key={store.id} value={store.id}>
                       {store.name}
                     </SelectItem>

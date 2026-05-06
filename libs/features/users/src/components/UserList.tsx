@@ -102,7 +102,7 @@ export function UserList({
     {
       header: 'Avatar',
       accessorKey: 'avatar',
-      cell: (value: any, row: User) => (
+      cell: (value: unknown, row: User) => (
         <Avatar className="h-10 w-10">
           <AvatarImage src={value as string | undefined} alt={row.name} />
           <AvatarFallback>
@@ -130,7 +130,7 @@ export function UserList({
       header: 'Role',
       accessorKey: 'role',
       sortable: true,
-      cell: (value: any) => {
+      cell: (value: unknown) => {
         const role = value as string;
         const variant =
           role === 'admin'
@@ -149,7 +149,7 @@ export function UserList({
     {
       header: 'Status',
       accessorKey: 'isActive',
-      cell: (value: any) => (
+      cell: (value: unknown) => (
         <Badge variant={value ? 'default' : 'secondary'}>
           {value ? 'Active' : 'Inactive'}
         </Badge>
@@ -159,12 +159,12 @@ export function UserList({
       header: 'Created',
       accessorKey: 'createdAt',
       sortable: true,
-      cell: (value: any) => formatDate(value as Date, 'MMM dd, yyyy'),
+      cell: (value: unknown) => formatDate(value as Date, 'MMM dd, yyyy'),
     },
     {
       header: 'Actions',
       accessorKey: 'id',
-      cell: (value: any, row: User) => (
+      cell: (value: unknown, row: User) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm">

@@ -1,6 +1,6 @@
 /**
  * VendorList Component
- * 
+ *
  * Displays vendors in a responsive DataTable with search, filters, and actions.
  */
 
@@ -54,13 +54,12 @@ export function VendorList({
 }: VendorListProps) {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [statusFilter, setStatusFilter] = useState<
+    'all' | 'active' | 'inactive'
+  >('all');
 
-  // Fetch vendors with query params
-  const { data, isLoading, error } = useVendors({
-    search: search || undefined,
-    isActive: statusFilter === 'all' ? undefined : statusFilter === 'active',
-  });
+  // Fetch all vendors (client-side filtering for better UX)
+  const { data, isLoading, error } = useVendors();
 
   const handleView = (id: string) => {
     if (onViewClick) {
@@ -181,7 +180,28 @@ export function VendorList({
     );
   }
 
-  const vendors = data?.data || [];
+  // Filter vendors client-side
+  const allVendors = data?.data || [];
+  const vendors = allVendors.filter((vendor) => {
+    // Status filter
+    if (
+      statusFilter !== 'all' &&
+      vendor.isActive !== (statusFilter === 'active')
+    ) {
+      return false;
+    }
+    // Search filter
+    if (search) {
+      const searchLower = search.toLowerCase();
+      return (
+        vendor.name.toLowerCase().includes(searchLower) ||
+        vendor.email.toLowerCase().includes(searchLower) ||
+        vendor.company?.toLowerCase().includes(searchLower) ||
+        vendor.phone?.toLowerCase().includes(searchLower)
+      );
+    }
+    return true;
+  });
 
   return (
     <div className="space-y-4">
@@ -196,7 +216,9 @@ export function VendorList({
           />
           <Select
             value={statusFilter}
-            onValueChange={(value) => setStatusFilter(value as 'all' | 'active' | 'inactive')}
+            onValueChange={(value) =>
+              setStatusFilter(value as 'all' | 'active' | 'inactive')
+            }
           >
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filter by status" />

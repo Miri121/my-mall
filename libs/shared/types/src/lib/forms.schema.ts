@@ -26,7 +26,7 @@ export const RegisterFormDataSchema = z
       .max(100),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
     phone: z.string().optional(),
-    preferredLanguage: z.enum(['en', 'he']).optional().default('en'),
+    preferredLanguage: z.enum(['en', 'he']),
     acceptTerms: z.boolean().refine((val) => val === true, {
       message: 'You must accept the terms and conditions',
     }),
