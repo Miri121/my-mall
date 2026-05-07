@@ -2,14 +2,22 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 /**
- * Store for managing customer product favorites
+ * Store for managing customer product and store favorites
  * Persists to localStorage with key 'customer-favorites'
  */
+export interface FavoriteItem {
+  id: string;
+  name: string;
+  type: 'product' | 'store';
+  image?: string;
+  slug?: string;
+}
+
 interface FavoritesState {
-  favorites: string[];
-  addToFavorites: (productId: string) => void;
-  removeFromFavorites: (productId: string) => void;
-  isFavorite: (productId: string) => boolean;
+  favorites: FavoriteItem[];
+  addItem: (item: FavoriteItem) => void;
+  removeItem: (itemId: string) => void;
+  isFavorite: (itemId: string) => boolean;
   clearFavorites: () => void;
 }
 
@@ -18,22 +26,22 @@ export const useFavoritesStore = create<FavoritesState>()(
     (set, get) => ({
       favorites: [],
 
-      addToFavorites: (productId: string) => {
+      addItem: (item: FavoriteItem) => {
         const { favorites } = get();
         // Prevent duplicates
-        if (!favorites.includes(productId)) {
-          set({ favorites: [...favorites, productId] });
+        if (!favorites.some((fav) => fav.id === item.id)) {
+          set({ favorites: [...favorites, item] });
         }
       },
 
-      removeFromFavorites: (productId: string) => {
+      removeItem: (itemId: string) => {
         set((state) => ({
-          favorites: state.favorites.filter((id) => id !== productId),
+          favorites: state.favorites.filter((item) => item.id !== itemId),
         }));
       },
 
-      isFavorite: (productId: string) => {
-        return get().favorites.includes(productId);
+      isFavorite: (itemId: string) => {
+        return get().favorites.some((item) => item.id === itemId);
       },
 
       clearFavorites: () => {
