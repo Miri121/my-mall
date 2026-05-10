@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from '@tanstack/react-router';
 import { LoadingSpinner } from '@org/ui';
 import { useAuth } from '../hooks/useAuth';
 
@@ -22,7 +22,7 @@ export function GuestOnly({ children }: GuestOnlyProps) {
   if (isAuthenticated && user) {
     // Redirect based on user role
     const dashboardRoutes: Record<string, string> = {
-      admin: '/admin/dashboard',
+      admin: '/dashboard',
       vendor: '/vendor/dashboard',
       customer: '/shop',
     };

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from '@tanstack/react-router';
 import { LoadingSpinner, ErrorMessage } from '@org/ui';
 import { useAuth } from '../hooks/useAuth';
 import type { UserRole } from '@org/types';

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from '@tanstack/react-router';
 import { LoadingSpinner } from '@org/ui';
 import { useAuth } from '../hooks/useAuth';
 
@@ -10,7 +10,6 @@ interface RequireAuthProps {
 // Protected route wrapper - redirects unauthenticated users to login
 export function RequireAuth({ children }: RequireAuthProps) {
   const { isAuthenticated, isLoading } = useAuth();
-  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -21,8 +20,8 @@ export function RequireAuth({ children }: RequireAuthProps) {
   }
 
   if (!isAuthenticated) {
-    // Redirect to login with return URL
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Redirect to login
+    return <Navigate to="/login" replace />;
   }
 
   return children;
