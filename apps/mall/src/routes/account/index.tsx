@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@org/ui';
-import { User, Heart, History, Settings, Lock } from 'lucide-react';
+import { User, Heart, History, Settings, Lock, Trash2 } from 'lucide-react';
 
 function AccountDashboard() {
   const { t } = useTranslation('common');
@@ -45,6 +45,12 @@ function AccountDashboard() {
       icon: History,
       title: t('account.history', 'Browsing History'),
       description: t('account.historyDesc', 'See what you viewed recently'),
+    },
+    {
+      to: '/account/delete',
+      icon: Trash2,
+      title: t('account.delete', 'Delete Account'),
+      description: t('account.deleteDesc', 'Permanently delete your account'),
     },
   ];
 

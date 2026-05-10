@@ -1,1 +1,21 @@
-@import 'tailwindcss';
+@import '@org/ui/styles/globals.css';
+
+/* Vendor-specific theme overrides */
+:root {
+  --primary: 262 83% 58%;
+  --primary-foreground: 0 0% 100%;
+}
+
+.dark {
+  --primary: 262 83% 58%;
+  --primary-foreground: 0 0% 100%;
+}
+
+/* Vendor app specific styles */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

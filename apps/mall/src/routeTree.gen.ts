@@ -25,6 +25,7 @@ import { Route as AccountPreferencesRouteImport } from './routes/account/prefere
 import { Route as AccountPasswordRouteImport } from './routes/account/password'
 import { Route as AccountHistoryRouteImport } from './routes/account/history'
 import { Route as AccountFavoritesRouteImport } from './routes/account/favorites'
+import { Route as AccountDeleteRouteImport } from './routes/account/delete'
 
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
@@ -106,6 +107,11 @@ const AccountFavoritesRoute = AccountFavoritesRouteImport.update({
   path: '/account/favorites',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountDeleteRoute = AccountDeleteRouteImport.update({
+  id: '/account/delete',
+  path: '/account/delete',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
+  '/account/delete': typeof AccountDeleteRoute
   '/account/favorites': typeof AccountFavoritesRoute
   '/account/history': typeof AccountHistoryRoute
   '/account/password': typeof AccountPasswordRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
+  '/account/delete': typeof AccountDeleteRoute
   '/account/favorites': typeof AccountFavoritesRoute
   '/account/history': typeof AccountHistoryRoute
   '/account/password': typeof AccountPasswordRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
+  '/account/delete': typeof AccountDeleteRoute
   '/account/favorites': typeof AccountFavoritesRoute
   '/account/history': typeof AccountHistoryRoute
   '/account/password': typeof AccountPasswordRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/search'
+    | '/account/delete'
     | '/account/favorites'
     | '/account/history'
     | '/account/password'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/search'
+    | '/account/delete'
     | '/account/favorites'
     | '/account/history'
     | '/account/password'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/search'
+    | '/account/delete'
     | '/account/favorites'
     | '/account/history'
     | '/account/password'
@@ -225,6 +237,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   SearchRoute: typeof SearchRoute
+  AccountDeleteRoute: typeof AccountDeleteRoute
   AccountFavoritesRoute: typeof AccountFavoritesRoute
   AccountHistoryRoute: typeof AccountHistoryRoute
   AccountPasswordRoute: typeof AccountPasswordRoute
@@ -352,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountFavoritesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/delete': {
+      id: '/account/delete'
+      path: '/account/delete'
+      fullPath: '/account/delete'
+      preLoaderRoute: typeof AccountDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -361,6 +381,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   SearchRoute: SearchRoute,
+  AccountDeleteRoute: AccountDeleteRoute,
   AccountFavoritesRoute: AccountFavoritesRoute,
   AccountHistoryRoute: AccountHistoryRoute,
   AccountPasswordRoute: AccountPasswordRoute,

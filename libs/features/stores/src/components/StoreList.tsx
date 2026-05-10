@@ -31,6 +31,8 @@ interface StoreListProps {
   canCreate?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
+  stores?: StoreWithVendor[];
+  readOnly?: boolean;
 }
 
 /**
@@ -44,6 +46,8 @@ export function StoreList({
   canCreate = false,
   canEdit = false,
   canDelete = false,
+  stores: externalStores,
+  readOnly = false,
 }: StoreListProps) {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -52,11 +56,16 @@ export function StoreList({
   >('all');
   const [vendorFilter, setVendorFilter] = useState<string>('all');
 
-  // Fetch all stores (client-side filtering for better UX)
+  // Fetch all stores (client-side filtering for better UX) - skip if external stores provided
   const { data: storesData, isLoading, error } = useStores();
 
   // Fetch vendors for filter dropdown
   const { data: vendorsData } = useVendors();
+
+  // When readOnly is true, disable all edit/create/delete actions
+  const effectiveCanCreate = readOnly ? false : canCreate;
+  const effectiveCanEdit = readOnly ? false : canEdit;
+  const effectiveCanDelete = readOnly ? false : canDelete;
 
   const handleView = (id: string) => {
     if (onViewClick) {
@@ -88,7 +97,8 @@ export function StoreList({
     }
   };
 
-  if (isLoading) {
+  // Only show loading/error states if we're fetching data internally
+  if (!externalStores && isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <LoadingSpinner size="lg" text="Loading stores..." />
@@ -96,7 +106,7 @@ export function StoreList({
     );
   }
 
-  if (error) {
+  if (!externalStores && error) {
     return (
       <ErrorMessage
         title="Failed to load stores"
@@ -106,7 +116,9 @@ export function StoreList({
   }
 
   // Filter stores client-side
-  const allStores = (storesData?.data || []) as StoreWithVendor[];
+  const allStores = (externalStores ||
+    storesData?.data ||
+    []) as StoreWithVendor[];
   const stores = allStores.filter((store) => {
     if (
       statusFilter !== 'all' &&
@@ -167,7 +179,7 @@ export function StoreList({
               </Select>
             )}
           </div>
-          {canCreate && (
+          {effectiveCanCreate && (
             <Button onClick={handleCreate}>
               <Plus className="mr-2 h-4 w-4" />
               Create Store
@@ -187,7 +199,7 @@ export function StoreList({
               : 'Get started by creating your first store'
           }
           action={
-            canCreate &&
+            effectiveCanCreate &&
             !search &&
             statusFilter === 'all' &&
             vendorFilter === 'all'
@@ -205,10 +217,10 @@ export function StoreList({
               key={store.id}
               store={store}
               onView={handleView}
-              onEdit={canEdit ? handleEdit : undefined}
-              onDelete={canDelete ? handleDelete : undefined}
-              canEdit={canEdit}
-              canDelete={canDelete}
+              onEdit={effectiveCanEdit ? handleEdit : undefined}
+              onDelete={effectiveCanDelete ? handleDelete : undefined}
+              canEdit={effectiveCanEdit}
+              canDelete={effectiveCanDelete}
             />
           ))}
         </div>

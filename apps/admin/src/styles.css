@@ -1,1 +1,21 @@
-@import 'tailwindcss';
+@import '@org/ui/styles/globals.css';
+
+/* Admin-specific theme overrides */
+:root {
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+}
+
+.dark {
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+}
+
+/* Admin app specific styles */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
