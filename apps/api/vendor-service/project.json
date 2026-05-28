@@ -1,0 +1,48 @@
+{
+  "name": "vendor-service",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/api/vendor-service/src",
+  "projectType": "application",
+  "tags": ["type:app", "scope:backend", "service:vendor"],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/api/vendor-service",
+        "main": "apps/api/vendor-service/src/main.ts",
+        "tsConfig": "apps/api/vendor-service/tsconfig.app.json",
+        "assets": ["apps/api/vendor-service/src/assets"],
+        "isolatedConfig": true,
+        "webpackConfig": "apps/api/vendor-service/webpack.config.js"
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "vendor-service:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "vendor-service:build:development"
+        },
+        "production": {
+          "buildTarget": "vendor-service:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
